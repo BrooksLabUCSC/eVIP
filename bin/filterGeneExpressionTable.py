@@ -179,7 +179,7 @@ def main(in_table,out_table,x,l,reformat_gene,fpkms,min_fpkm,min_fold_fpkm):
         fpkm_out.close()
 
 
-    sys.exit(0)
+    # sys.exit(0)
 
 ############
 # END_MAIN #

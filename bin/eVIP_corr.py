@@ -16,6 +16,9 @@ def main():
 
     args = parser.parse_args()
 
+    global CLOSE_TO_ZERO
+    CLOSE_TO_ZERO = 0.000000000000001
+
     #if the input is gene expression data
     if args.input != None:
         if not os.path.exists(args.out_dir):
@@ -115,6 +118,10 @@ def main():
 
 
 def run_main(input=None, zscore_gct=None, out_dir=None):
+
+    global CLOSE_TO_ZERO
+    CLOSE_TO_ZERO = 0.000000000000001
+
     # if the input is gene expression data
     if input != None:
 
