@@ -10,7 +10,7 @@ dependencies:
   - Cython
   - pandas
   - scipy
-  - numpy
+  - numpy=1.16.4
   - cmapPy
   - matplotlib
   - rpy2=2.8.6
