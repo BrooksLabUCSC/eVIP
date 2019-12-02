@@ -227,15 +227,16 @@ Enter the eVIP2 directory:
 
 #### Create eVIP conda environment
 
-Create the environment: `conda env create -f misc/evip_env.yaml`
+Create the environment: `conda env create -f misc/evip2_env.yaml`
 
-Activate the environment: `conda activate evip_env`
+Activate the environment: `conda activate evip2_env`
 
 #### Download files
 
-Download the gtf file from ensembl to the tutorial_files folder: `wget http://ftp.ensembl.org/pub/release-87/gtf/homo_sapiens/Homo_sapiens.GRCh38.87.gtf.gz tutorial_files/`
+Download the gtf file from ensembl to the tutorial_files folder: `wget http://ftp.ensembl.org/pub/release-87/gtf/homo_sapiens/Homo_sapiens.GRCh38.87.gtf.gz -P tutorial_files/`
 
-uncompress the file:
+
+decompress the file:
 `gunzip tutorial_files/Homo_sapiens.GRCh38.87.gtf.gz`
 
 Download kallisto files:
@@ -244,5 +245,5 @@ Download kallisto files:
 
 #### run eVIP2
 
-`python run_eVIP2.py -input_dir tutorial_files/kallisto_outputs -out_directory tutorial_files/eVIP2_out -sig_info tutorial_files/RNF43_sig.info -c tutorial_files/controls.grp -r tutorial_files/comparisons.tsv -by_gene_color tutorial_files/RNF43_gene_label.tsv -allele_col allele -ie_col 293_ie -num_reps 4 -x_thresh 1.3 -y_thresh 1.3  -ymin -2 -ymax 4 -corr_val "spearman" -use_c_pval -eVIPP -JSON tutorial_files/hallmark.all.v6.0.symbols.json -min_genes 10 -annotate -gtf tutorial_files/Homo_sapiens.GRCh38.87.gtf
+`python run_eVIP2.py -input_dir tutorial_files/RNF43_kallisto_outputs -out_directory tutorial_files/eVIP2_out -sig_info tutorial_files/RNF43_sig.info -c tutorial_files/controls.grp -r tutorial_files/comparisons.tsv -by_gene_color tutorial_files/RNF43_gene_label.tsv -allele_col allele -ie_col 293_ie -num_reps 4 -x_thresh 1.3 -y_thresh 1.3  -ymin -2 -ymax 4 -corr_val "spearman" -use_c_pval -eVIPP -JSON tutorial_files/hallmark.all.v6.0.symbols.json -min_genes 10 -annotate -gtf tutorial_files/Homo_sapiens.GRCh38.87.gtf
 `
