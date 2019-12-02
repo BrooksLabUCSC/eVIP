@@ -1,0 +1,29 @@
+name: evip_env
+channels:
+  - bioconda
+  - conda
+  - conda-forge
+  - r
+dependencies:
+  - python=2.7.*
+  - numpy
+  - Cython
+  - pandas
+  - scipy
+  - numpy
+  - cmapPy
+  - matplotlib
+  - rpy2=2.8.6
+  - pytables
+  - blessings
+  - R=3.5.*
+  - bioconductor-deseq2
+  - bioconductor-tximportData
+  - bioconductor-tximport
+  - bioconductor-ensembldb
+  - bioconductor-EnsDb.Hsapiens.v86
+  - bioconductor-rhdf5
+  - pip
+  - pip:
+    - kerneltree
+    - pyGeno
