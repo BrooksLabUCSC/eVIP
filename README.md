@@ -6,7 +6,7 @@ Expression-based variant impact phenotyping (eVIP) is an approach to predict fun
 For pathway analysis, eVIP Pathways first finds differentially expressed genes that are specific to the WT or mutant. The WT gene and each mutant are compared to the control using [DESeq2](https://bioconductor.org/packages/release/bioc/html/DESeq2.html). We define mutation-specific genes as genes that are differentially expressed only in the control vs mutation and not in the control versus WT. These genes represent a new function caused by the mutant. The WT-specific genes are differentially expressed only in the control versus WT and not in the control versus mutant. These are genes that are expected to be affected by normal WT function, but are not affected by the mutant, and therefore contribute to mutant  loss of function. eVIP Pathways is then run separately using the WT-specific and mutant-specific genes (with multiple-testing correction).
 
 
-### How to cite eVIP?
+### How to cite eVIP
 The eVIP method was originally described in :
 
 High-throughput Phenotyping of Lung Cancer Somatic Mutations Berger AH, Brooks AN, Wu X, Shrestha Y, Chouinard C, Piccioni F, Bagul M, Kamburov A, Imielinski M, Hogstrom L, Zhu C, Yang X, Pantel S, Sakai R, Watson J, Kaplan N, Campbell JD, Singh S, Root DE, Narayan R, Natoli T, Lahr DL, Tirosh I, Tamayo P, Getz G, Wong B, Doench J, Subramanian A, Golub TR, Meyerson M, Boehm JS. Cancer Cell, Aug 8;30(2):214-28
