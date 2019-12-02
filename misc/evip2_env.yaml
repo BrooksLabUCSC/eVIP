@@ -1,4 +1,4 @@
-name: evip_env
+name: evip2_env
 channels:
   - bioconda
   - conda
