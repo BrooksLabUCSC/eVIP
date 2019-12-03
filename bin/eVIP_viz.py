@@ -21,7 +21,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import scipy.spatial.distance as distance
 import scipy.cluster.hierarchy as sch
-import cmap.io.gct as gct
+import cmapPy.pandasGEXpress.parse_gct as gct
 
 from eVIP_compare import getSelfConnectivity, getConnectivity
 
@@ -229,12 +229,13 @@ def main():
 #   for val in null_conn:
 #       null_x_vals.append(random.uniform(NULL_CONN_RANGE[0], NULL_CONN_RANGE[1]))
 
-    this_gctx = gct.GCT(options.gctx)
-    this_gctx.read()
+    this_gctx = gct.parse(options.gctx)
+
+    # this_gctx.read()
 
 
-    sig_gctx = gct.GCT(options.sig_gctx)
-    sig_gctx.read()
+    sig_gctx = gct.parse(options.sig_gctx)
+    # sig_gctx.read()
 
     # Process predictions
     # allele2pvals = {allele:[mut vs wt pval,
@@ -259,7 +260,7 @@ def main():
 
         wt_heatmap_ax = plt.subplot2grid(grid_size, (0,0))
         wt_im = plot_rep_heatmap(wt_heatmap_ax,
-                         this_gctx.frame,
+                         this_gctx.data_df,
                          allele2distil_ids[gene2wt[gene]],
                          allele2distil_ids[gene2wt[gene]],
                          gene2wt[gene],
@@ -286,7 +287,7 @@ def main():
 
                 # CREATE SCATTERPLOT FIGURE
                 plot_signatures(pdf, out_dir,
-                                sig_gctx.frame,
+                                sig_gctx.data_df,
                                 gene2wt[gene],
                                 allele,
                                 allele2distil_ids[gene2wt[gene]],
@@ -296,7 +297,7 @@ def main():
                 this_hm_ax = plt.subplot2grid(grid_size,
                                              (0, col_counter))
                 plot_rep_heatmap(this_hm_ax,
-                                 this_gctx.frame,
+                                 this_gctx.data_df,
                                  allele2distil_ids[allele],
                                  allele2distil_ids[allele],
                                  type + " - " + allele,
@@ -308,7 +309,7 @@ def main():
                                                   (1, col_counter))
 
                 plot_rep_heatmap(this_wt_mut_ax,
-                                 this_gctx.frame,
+                                 this_gctx.data_df,
                                  allele2distil_ids[gene2wt[gene]],
                                  allele2distil_ids[allele],
                                  gene2wt[gene] + " vs " + allele,
@@ -392,12 +393,12 @@ def eVIP_run_main(pred_file=None, sig_info =None, gctx=None,
     sig_info = open(sig_info)
     null_conn = getNullConnDist(null_conn)
 
-    this_gctx = gct.GCT(gctx)
-    this_gctx.read()
+    this_gctx = gct.parse(gctx)
+    # this_gctx.read()
 
-    sig_gctx = gct.GCT(sig_gctx)
+    sig_gctx = gct.parse(sig_gctx)
 
-    sig_gctx.read()
+    # sig_gctx.read()
 
 
     (gene2wt,
@@ -419,7 +420,7 @@ def eVIP_run_main(pred_file=None, sig_info =None, gctx=None,
 
         wt_heatmap_ax = plt.subplot2grid(grid_size, (0,0))
         wt_im = plot_rep_heatmap(wt_heatmap_ax,
-                         this_gctx.frame,
+                         this_gctx.data_df,
                          allele2distil_ids[gene2wt[gene]],
                          allele2distil_ids[gene2wt[gene]],
                          gene2wt[gene],
@@ -446,7 +447,7 @@ def eVIP_run_main(pred_file=None, sig_info =None, gctx=None,
 
                 # CREATE SCATTERPLOT FIGURE
                 plot_signatures(pdf, out_dir,
-                                sig_gctx.frame,
+                                sig_gctx.data_df,
                                 gene2wt[gene],
                                 allele,
                                 allele2distil_ids[gene2wt[gene]],
@@ -459,7 +460,7 @@ def eVIP_run_main(pred_file=None, sig_info =None, gctx=None,
 
 
                 plot_rep_heatmap(this_hm_ax,
-                                 this_gctx.frame,
+                                 this_gctx.data_df,
                                  allele2distil_ids[allele],
                                  allele2distil_ids[allele],
                                  type + " - " + allele,
@@ -473,7 +474,7 @@ def eVIP_run_main(pred_file=None, sig_info =None, gctx=None,
 
 
                 plot_rep_heatmap(this_wt_mut_ax,
-                                 this_gctx.frame,
+                                 this_gctx.data_df,
                                  allele2distil_ids[gene2wt[gene]],
                                  allele2distil_ids[allele],
                                  gene2wt[gene] + " vs " + allele,

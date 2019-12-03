@@ -17,10 +17,12 @@ import os
 import pdb
 import math
 import random
-import rpy2.robjects as robjects
-import cmap.io.gct as gct
-import cmap.io.plategrp as grp
 import numpy
+import rpy2.robjects as robjects
+import cmapPy.pandasGEXpress.parse as gct
+import cmapPy.pandasGEXpress.subset as grp
+from cmapPy.pandasGEXpress.parse import parse
+
 
 import matplotlib
 matplotlib.use('Agg')
@@ -188,7 +190,7 @@ def main():
     output_file_prefix = open(options.output_file_prefix + ".txt", "w")
 
     # Output distribution files
-    controls = grp.read_grp(options.controls_file)
+    controls = grp.grp.read(options.controls_file)
 
     reference_test_filename = options.reference_test_file
     ref2test_allele = None
@@ -197,8 +199,9 @@ def main():
 
     allele_col = options.allele_col
 
-    this_gctx = gct.GCT(options.gctx)
-    this_gctx.read()
+    this_gctx = gct.parse(options.gctx)
+
+    # this_gctx.read()
 
     num_iterations = options.num_iterations
     num_reps = options.num_reps
@@ -213,7 +216,7 @@ def main():
     #     rep_nulls_from_input_str = grp.read_grp(rep_null_input)
     #     rep_nulls_from_input = map(float, rep_nulls_from_input_str)
     if conn_null_input:
-        conn_nulls_from_input_str = grp.read_grp(conn_null_input)
+        conn_nulls_from_input_str = grp.grp.read(conn_null_input)
         conn_nulls_from_input = map(float, conn_nulls_from_input_str)
 
     (allele2distil_id,
@@ -392,15 +395,15 @@ def run_main(sig_info=None, gctx = None, allele_col = None, o = None, r = None,
     output_file_prefix = open(o + ".txt", "w")
 
     # Output distribution files
-    controls = grp.read_grp(c)
+    controls = grp.grp.read(c)
 
     reference_test_filename = r
     ref2test_allele = None
     if reference_test_filename:
         ref2test_allele = parseRefTestFile(reference_test_filename)
 
-    this_gctx = gct.GCT(gctx)
-    this_gctx.read()
+    this_gctx = parse(gctx)
+    # this_gctx.read()
 
     num_iterations = int(i)
     num_reps = int(num_reps)
@@ -408,7 +411,7 @@ def run_main(sig_info=None, gctx = None, allele_col = None, o = None, r = None,
     conn_null_input = conn_null
 
     if conn_null_input:
-        conn_nulls_from_input_str = grp.read_grp(conn_null_input)
+        conn_nulls_from_input_str = grp.grp.read(conn_null_input)
         conn_nulls_from_input = map(float, conn_nulls_from_input_str)
 
     (allele2distil_id,
@@ -465,12 +468,8 @@ def run_main(sig_info=None, gctx = None, allele_col = None, o = None, r = None,
 
     outlines = []
 
-    print allele2WT
-
     # Build comparison
     for allele in allele2WT:
-
-	print allele
 
         # Don't calculate for the WT allele
         if allele == allele2WT[allele]:
@@ -597,7 +596,7 @@ def getSelfConnectivity(this_gctx, distil_ids, num_reps):
         for j in range(num_reps):
             if i == j:
                 continue
-            rank_pts.append(float(this_gctx.frame[distil_ids[i]]
+            rank_pts.append(float(this_gctx.data_df[distil_ids[i]]
                                                  [distil_ids[j]]))
 
         row_medians.append(numpy.percentile(rank_pts, 50))
@@ -608,7 +607,7 @@ def getSelfConnectivity(this_gctx, distil_ids, num_reps):
 #   rep_rankpts = []
 #   for i in range(num_reps):
 #       for j in range(i+1, num_reps):
-#           rep_rankpts.append(float(this_gctx.frame[distil_ids[i]]
+#           rep_rankpts.append(float(this_gctx.data_df[distil_ids[i]]
 #                                                   [distil_ids[j]]))
 #
 #   return numpy.percentile(rep_rankpts, 50), rep_rankpts
@@ -625,7 +624,7 @@ def getConnectivity(this_gctx, distil_ids1, distil_ids2, num_reps):
     for i in range(num_reps):
         row_rankpts = []
         for j in range(num_reps):
-            val = float(this_gctx.frame[distil_ids1[i]][distil_ids2[j]])
+            val = float(this_gctx.data_df[distil_ids1[i]][distil_ids2[j]])
             row_rankpts.append(val)
             col_rankpts[j].append(val)
 
@@ -639,7 +638,7 @@ def getConnectivity(this_gctx, distil_ids1, distil_ids2, num_reps):
 #   conn_rankpts = []
 #   for i in range(num_reps):
 #       for j in range(num_reps):
-#           conn_rankpts.append(float(this_gctx.frame[distil_ids1[i]]
+#           conn_rankpts.append(float(this_gctx.data_df[distil_ids1[i]]
 #                                                    [distil_ids2[j]]))
 
 #   return numpy.percentile(conn_rankpts, 50), conn_rankpts
@@ -693,17 +692,18 @@ def getNullDist(this_gctx, allele2distil_id, controls,
         # Get replicate null
         # First version. control vs. pert. This approach seemed to not be the
         # best control.
-#       rep_null_dist.append(float(this_gctx.frame[random.choice(allele2distil_id[random_control])]
+#       rep_null_dist.append(float(this_gctx-----------[random.choice(allele2distil_id[random_control])]
 #                                                 [random.choice(allele2distil_id[random_allele])]))
 
         # Introspect similarity is median of row similarities
         rank_pts = []
         for i in range(1, num_reps):
-            rank_pts.append(float(this_gctx.frame[control_distil_ids[0]][control_distil_ids[i]]))
+
+            rank_pts.append(float(this_gctx.data_df[control_distil_ids[0]][control_distil_ids[i]]))
 
 #       for i in range(num_reps):
 #           for j in range(i+1,num_reps):
-#               rank_pts.append(float(this_gctx.frame[control_distil_ids[i]][control_distil_ids[j]]))
+#               rank_pts.append(float(this_gctx-----------[control_distil_ids[i]][control_distil_ids[j]]))
 
         rep_null_dist.append(numpy.percentile(rank_pts, 50))
 
@@ -714,7 +714,7 @@ def getNullDist(this_gctx, allele2distil_id, controls,
         # Get connectivity null
         rank_pts = []
         for i in range(num_reps):
-            rank_pts.append(float(this_gctx.frame[allele2distil_id[random_control][0]]
+            rank_pts.append(float(this_gctx.data_df[allele2distil_id[random_control][0]]
                                                  [allele2distil_id[random_allele][i]]))
 #       for i in range(num_reps):
 #           for j in range(num_reps):

@@ -24,7 +24,7 @@ from matplotlib.colors import colorConverter
 import numpy as np
 import scipy.spatial.distance as distance
 import scipy.cluster.hierarchy as sch
-import cmap.io.gct as gct
+import cmapPy.pandasGEXpress.parse_gct as gct
 
 from eVIP_predict import max_diff
 from eVIP_compare import getSelfConnectivity, getConnectivity

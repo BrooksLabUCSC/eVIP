@@ -223,10 +223,10 @@ If plots made by eVIP_viz.py are blank, adjust the min and max.
 
 #### Clone eVIP2 github directory
 
-Clone the eVIP2 repo to the desired path on your machine: `git clone https://github.com/BrooksLabUCSC/eVIP2.git /path/to/eVIP2`
+Clone the eVIP2 repo to the desired path on your machine: `git clone https://github.com/BrooksLabUCSC/eVIP2.git`
 
 Enter the eVIP2 directory:
-`cd  /path/to/eVIP2/`
+`cd eVIP2`
 
 #### Create eVIP conda environment
 

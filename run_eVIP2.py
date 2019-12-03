@@ -127,8 +127,6 @@ def main(infile=None, zscore_gct = None, out_directory=None, sig_info =None, c=N
                  args.x_thresh, args.y_thresh, args.annotate, args.by_gene_color, args.pdf, args.xmin,
                  args.xmax, args.ymin, args.ymax, args.viz_ymin, args.viz_ymax, args.corr_val)
 
-
-
     #############################################################################
     ### eVIP Pathways
 
