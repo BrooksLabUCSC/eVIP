@@ -120,6 +120,7 @@ def main(infile=None, zscore_gct = None, out_directory=None, sig_info =None, c=N
     if not os.path.exists(overall_eVIP_dir):
         os.makedirs(overall_eVIP_dir)
 
+
     print("Running eVIP for overall function...")
     run_eVIP(args.out_directory+"/kallisto_files/combined_kallisto_abundance_genes_filtered_transformed.tsv", None, overall_eVIP_dir, args.sig_info, args.c, args.r, args.num_reps,
                  args.ie_filter, args.ie_col, args.i, args.allele_col, args.conn_null, args.conn_thresh,
@@ -127,10 +128,13 @@ def main(infile=None, zscore_gct = None, out_directory=None, sig_info =None, c=N
                  args.x_thresh, args.y_thresh, args.annotate, args.by_gene_color, args.pdf, args.xmin,
                  args.xmax, args.ymin, args.ymax, args.viz_ymin, args.viz_ymax, args.corr_val)
 
+
     #############################################################################
     ### eVIP Pathways
 
     if args.eVIPP:
+
+        print ("Running eVIP Pathways...")
 
         if not os.path.exists(args.out_directory + "/eVIPP_out"):
             os.makedirs(args.out_directory + "/eVIPP_out")
@@ -190,6 +194,9 @@ def main(infile=None, zscore_gct = None, out_directory=None, sig_info =None, c=N
 
             #making new comparisons file
             with open(args.r) as r, open(eVIPP_files+"/"+mut+"_comparisons.tsv","w+") as spec_comparisons:
+                spec_comparisons.write(("\t").join(["wt","mutant"]))
+                spec_comparisons.write("\n")
+
                 for line in r:
                     if line.split()[1] == mut:
                         spec_comparisons.write(line)
@@ -202,6 +209,7 @@ def main(infile=None, zscore_gct = None, out_directory=None, sig_info =None, c=N
 
             #how many mutspec genes were in the file?
             print "Number of mutation-specific genes present in the filtered kallisto file:",eVIP_gene_expression_mutspec.shape[0], "of" ,len(mutspec)
+            print ("\n")
 
             mutspec_infile = args.out_directory+"/kallisto_files/combined_kallisto_abundance_genes_filtered_transformed_"+mut+"_mutspec.tsv"
             eVIP_gene_expression_mutspec.to_csv(mutspec_infile,sep="\t",index=False)
@@ -229,6 +237,7 @@ def main(infile=None, zscore_gct = None, out_directory=None, sig_info =None, c=N
 
             #how many mutspec genes were in the file?
             print "Number of wt-specific genes present in the filtered kallisto file:",eVIP_gene_expression_wtspec.shape[0], "of" ,len(wtspec)
+            print ("\n")
 
             wtspec_infile = args.out_directory+"/kallisto_files/combined_kallisto_abundance_genes_filtered_transformed_transformed_"+mut+"_wtspec.tsv"
             eVIP_gene_expression_wtspec.to_csv(wtspec_infile,sep="\t",index=False)
@@ -420,30 +429,30 @@ def run_eVIP(infile=None, zscore_gct = None, out_directory=None, sig_info =None,
 
 
     # run eVIP_corr.py
-    print('calculating correlations...')
+    # print('calculating correlations...')
     run_corr = eVIP_corr.run_main(input=infile,zscore_gct=zscore_gct, out_dir= out_directory)
 
-    print('comparing...')
+    # print('comparing...')
     run_compare = eVIP_compare.run_main(sig_info=sig_info, gctx = out_directory+"/spearman_rank_matrix.gct",
                 allele_col = args.allele_col, o= out_directory+"/compare", r = args.r,
              c = args.c, i = args.i, conn_null = args.conn_null, ie_col = args.ie_col,
              ie_filter = args.ie_filter, num_reps = args.num_reps, cell_id = args.cell_id, plate_id = args.plate_id)
 
-    print('predicting...')
+    # print('predicting...')
     run_predict = eVIP_predict.run_main(i= out_directory+"/compare.txt", o= out_directory+"/predict", conn_thresh=args.conn_thresh,
                 mut_wt_rep_thresh=args.mut_wt_rep_thresh, mut_wt_rep_rank_diff=args.mut_wt_rep_rank_diff,
                 disting_thresh=args.disting_thresh, use_c_pval=args.use_c_pval)
 
 
     if not args.sparkler_off:
-        print "making sparkler plots..."
+        # print "making sparkler plots..."
         run_sparkler = eVIP_sparkler.eVIP_run_main(pred_file = out_directory+"/predict.txt", ref_allele_mode=args.ref_allele_mode,
                 y_thresh = args.y_thresh , x_thresh = args.x_thresh,
                 use_c_pval= args.use_c_pval,annotate=args.annotate, by_gene_color= args.by_gene_color, pdf= args.pdf,
                 xmin= args.xmin, xmax = args.xmax, ymin = args.ymin, ymax = args.ymax, out_dir = out_directory+"/sparkler_plots")
 
     if not args.viz_off:
-        print "making visualizations..."
+        # print "making visualizations..."
         if args.conn_null:
             null_conn = args.conn_null
         else:

@@ -43,9 +43,9 @@ xmax, ymin, ymax, viz_ymin, viz_ymax, corr_val,mut_wt_rep_thresh,disting_thresh,
         summarize_predict_files(used_pathways, summary_eVIPP_vals,out_dir)
 
         #eVIPP sparkler
-        print "\n"
+        # print "\n0"
 
-        print "Making allele pathway sparkler plots..."
+        # print "Making allele pathway sparkler plots..."
         run_eVIPP_sparkler = eVIPP_sparkler.main(out_dir + "/eVIPP_combined_predict_files.txt", ref_allele_mode, y_thresh, x_thresh, use_c_pval,
                  annotate, by_gene_color, pdf, xmin, xmax, ymin, ymax,
                  out_dir + "/eVIPP_sparkler_plots")
@@ -107,7 +107,7 @@ xmax, ymin, ymax, viz_ymin, viz_ymax, corr_val,mut_wt_rep_thresh,disting_thresh,
 
                     for pathway in used_pathways:
                         # print "pathway running pt2 of eVIP"
-                        print pathway
+                        # print pathway
 
                         pathway_out_file_txt = out_dir + "/" + pathway + "_expression.txt"
                         p_out_directory = out_dir + "/" + pathway + "_eVIPP_outputs"
@@ -170,7 +170,7 @@ def JSON_pway(JSON_file,out_dir,infile,min_genes):
             matched_length = str(len(matched_ids))
             ensembl_length = str(len(pathway_genes))
 
-            print matched_length + " of " + ensembl_length + " IDs were found in the data. "
+            print matched_length + " of " + ensembl_length + " IDs were found. "
 
             percent_matched = (float(len(matched_ids))/(float(len(pathway_genes))))*100
             print "percent matched: " + str(percent_matched)
@@ -207,11 +207,11 @@ def run_eVIP_multiple_testing_pt1(infile=None, zscore_gct = None, out_directory=
 
 
     #run eVIP_corr.py
-    print('calculating correlations...')
+    # print('calculating correlations...')
     run_corr = eVIP_corr.run_main(input=infile,zscore_gct=zscore_gct, out_dir= out_directory)
 
     #run eVIP_compare.py
-    print('comparing...')
+    # print('comparing...')
     run_compare = eVIP_compare.run_main(sig_info, out_directory+"/spearman_rank_matrix.gct", allele_col , out_directory+"/compare", r ,c , i , conn_null , ie_col, ie_filter, num_reps, cell_id , plate_id)
 
     #getting the p values from the pathway compare file
@@ -246,14 +246,14 @@ def run_eVIP_multiple_testing_pt2(infile=None, zscore_gct = None, out_directory=
 
     sig_gctx_val = out_directory+ "/z_scores.gct"
 
-    print('predicting...')
+    # print('predicting...')
     run_predict = eVIP_predict.run_main(out_directory+"/adj_compare.txt", out_directory+"/predict", conn_thresh,
                 mut_wt_rep_thresh, mut_wt_rep_rank_diff,
                 disting_thresh, use_c_pval)
 
 
     if not sparkler_off:
-        print "making sparkler plots..."
+        # print "making sparkler plots..."
         run_sparkler = eVIP_sparkler.eVIP_run_main(out_directory+"/predict.txt", ref_allele_mode,
                 y_thresh , x_thresh,
                 use_c_pval,annotate, by_gene_color, pdf,
@@ -272,7 +272,7 @@ def run_eVIP_multiple_testing_pt2(infile=None, zscore_gct = None, out_directory=
                 out_dir = out_directory+"/viz",ymin = args.viz_ymin, ymax= args.viz_ymax, allele_col = args.allele_col, use_c_pval = args.use_c_pval,
                  pdf = args.pdf, cell_id = args.cell_id, plate_id = args.plate_id, corr_val_str= args.corr_val)
         """
-    print "Pathway is DONE"
+    # print "Pathway is DONE"
 
 def run_eVIP(infile=None, zscore_gct = None, out_directory=None, sig_info =None, c=None, r=None, num_reps=None,
          ie_filter=None,ie_col=None, i=None, allele_col=None, conn_null=None, conn_thresh=None,
@@ -288,30 +288,30 @@ def run_eVIP(infile=None, zscore_gct = None, out_directory=None, sig_info =None,
 
 
     # run eVIP_corr.py
-    print('calculating correlations...')
+    # print('calculating correlations...')
     run_corr = eVIP_corr.run_main(input=infile,zscore_gct=zscore_gct, out_dir= out_directory)
 
-    print('comparing...')
+    # print('comparing...')
     run_compare = eVIP_compare.run_main(sig_info=sig_info, gctx = out_directory+"/spearman_rank_matrix.gct",
                 allele_col = allele_col, o= out_directory+"/compare", r = r,
              c = c, i = i, conn_null = conn_null, ie_col = ie_col,
              ie_filter = ie_filter, num_reps = num_reps, cell_id = cell_id, plate_id = plate_id)
 
-    print('predicting...')
+    # print('predicting...')
     run_predict = eVIP_predict.run_main(out_directory+"/compare.txt", out_directory+"/predict", conn_thresh,
                 mut_wt_rep_thresh, mut_wt_rep_rank_diff,
                 disting_thresh, use_c_pval)
 
 
     if not sparkler_off:
-        print "making sparkler plots..."
+        # print "making sparkler plots..."
         run_sparkler = eVIP_sparkler.eVIP_run_main(pred_file = out_directory+"/predict.txt", ref_allele_mode=ref_allele_mode,
                 y_thresh = y_thresh , x_thresh = x_thresh,
                 use_c_pval= use_c_pval,annotate=annotate, by_gene_color= by_gene_color, pdf= pdf,
                 xmin= xmin, xmax = xmax, ymin = ymin, ymax = ymax, out_dir = out_directory+"/sparkler_plots")
 
     if not viz_off:
-        print "making visualizations..."
+        # print "making visualizations..."
         if conn_null:
             null_conn = conn_null
         else:
