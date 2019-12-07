@@ -78,7 +78,7 @@ def main(group1=None, group2=None, outDir=None, inDir=None, formula=None):
     R('res<-res[order(res$padj),]')
 
     # writing deseq2 results to a file
-    Out = os.path.join(outDir, "%s_v_%s_deseq2_results.tsv"  % (group1,group2))
+    Out = os.path.join(outDir, "%s_v_%s_deseq2_results.csv"  % (group1,group2))
     R.assign('Out',Out)
 
     R('write.csv(as.data.frame(res),file=Out)')
