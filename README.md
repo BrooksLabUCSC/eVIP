@@ -244,7 +244,7 @@ decompress the file:
 
 Download kallisto files:
 
-` ????? >  tutorial_files/kallisto_outputs  `
+` ***coming soon **** >  tutorial_files/kallisto_outputs  `
 
 #### run eVIP2
 
