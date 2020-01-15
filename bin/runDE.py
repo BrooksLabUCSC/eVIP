@@ -61,7 +61,8 @@ def main(group1=None, group2=None, outDir=None, inDir=None, formula=None):
     R.assign('sampleTable',sampleTable)
 
     #locate kallisto files
-    R('files <- file.path(inDir, samples, "abundance.h5")')
+    #would be faster to use kallito abundance.h5 files 
+    R('files <- file.path(inDir, samples, "abundance.tsv")')
     R('all(file.exists(files))')
 
     #tximport conversion to gene
