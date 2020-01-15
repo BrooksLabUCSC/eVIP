@@ -171,8 +171,8 @@ def main(infile=None, zscore_gct = None, out_directory=None, sig_info =None, c=N
             wt = i['wt']
             mut = i['mutant']
 
-            file_mut = args.out_directory+"/deseq2/"+deseq_control+"_vs_"+mut+"/"+deseq_control+"_v_"+mut+"_deseq2_results.tsv"
-            file_wt = args.out_directory+"/deseq2/"+deseq_control+"_vs_"+wt+"/"+deseq_control+"_v_"+wt+"_deseq2_results.tsv"
+            file_mut = args.out_directory+"/deseq2/"+deseq_control+"_vs_"+mut+"/"+deseq_control+"_v_"+mut+"_deseq2_results.csv"
+            file_wt = args.out_directory+"/deseq2/"+deseq_control+"_vs_"+wt+"/"+deseq_control+"_v_"+wt+"_deseq2_results.csv"
 
             #get mutation specific and wt specific genes
             mutspec,wtspec = getSpec.main(wt,mut,deseq_control,file_wt,file_mut)
