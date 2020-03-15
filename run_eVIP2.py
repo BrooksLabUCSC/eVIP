@@ -369,14 +369,13 @@ def transcript_to_gene_counts(transcript_df):
             #count dict
             try:
                 gene = transcript2gene[transcript]
+                if gene in estimated_counts_per_gene:
+                    estimated_counts_per_gene[gene] += row
+                else:
+                    estimated_counts_per_gene[gene] = row
             #pass if transcript not in conversion dictionary
             except:
                 pass
-
-            if gene in estimated_counts_per_gene:
-                estimated_counts_per_gene[gene] += row
-            else:
-                estimated_counts_per_gene[gene] = row
 
         gene_data[i] = pd.Series(estimated_counts_per_gene)
 
