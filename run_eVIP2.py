@@ -29,6 +29,7 @@ from bin import filterGeneExpressionTable
 from bin import runDE
 from bin import getSpec
 from bin import eVIPPspec
+from bin import combine_sparklers
 
 ########
 # MAIN #
@@ -155,6 +156,10 @@ def main(infile=None, zscore_gct = None, out_directory=None, sig_info =None, c=N
         else:
             deseq_control = controls_list[0]
 
+        if not deseq_control:
+            print("Error: Need deseq control. Set with -control ")
+            sys.exit()
+
         comparisons_df = pd.read_csv(args.r, sep="\t")
         comparisons_dict = comparisons_df.to_dict('records')
 
@@ -258,8 +263,9 @@ def main(infile=None, zscore_gct = None, out_directory=None, sig_info =None, c=N
             args.xmax, args.ymin, args.ymax, args.viz_ymin, args.viz_ymax, args.corr_val,args.mut_wt_rep_thresh,args.disting_thresh,args.sparkler_off,args.viz_off)
 
 
-
-
+        #####
+        # combine all eVIPP mutation-specific and WT-specific sparklers into a single report
+        combine_sparklers.run(args.out_directory + "/eVIPP_out",args.out_directory + "/eVIPP_out/all_eVIPP_sparklers.png")
 
 #############
 # FUNCTIONS #
