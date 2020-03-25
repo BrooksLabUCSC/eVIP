@@ -30,6 +30,8 @@ from bin import runDE
 from bin import getSpec
 from bin import eVIPPspec
 from bin import combine_sparklers
+from bin import upset_plot
+
 
 ########
 # MAIN #
@@ -228,11 +230,17 @@ def main(infile=None, zscore_gct = None, out_directory=None, sig_info =None, c=N
             if not os.path.exists(eVIPP_mutspec_out):
                 os.makedirs(eVIPP_mutspec_out)
 
+
             eVIPPspec.main(eVIPP_mutspec_out,args.JSON,args.min_genes,mutspec_infile,eVIPP_files+"/"+mut+"_sig.info", args.c, eVIPP_files+"/"+mut+"_comparisons.tsv", args.num_reps,
             args.ie_filter, args.ie_col, args.i, args.allele_col, args.conn_null, args.conn_thresh,
             args.mut_wt_rep_rank_diff, args.use_c_pval, args.cell_id, args.plate_id, args.ref_allele_mode,
             args.x_thresh, args.y_thresh, args.annotate, args.by_gene_color, args.pdf, args.xmin,
             args.xmax, args.ymin, args.ymax, args.viz_ymin, args.viz_ymax, args.corr_val,args.mut_wt_rep_thresh,args.disting_thresh,args.sparkler_off,args.viz_off)
+            
+
+            if os.path.exists(eVIPP_mutspec_out+"/eVIPP_combined_predict_files.txt"):
+                upset_plot.run(args.JSON,mutspec_infile,eVIPP_mutspec_out+"/eVIPP_combined_predict_files.txt",eVIPP_mutspec_out+"/eVIPP_gene_overlap.png")
+
 
             ######################################################################
             # wt specific
@@ -255,12 +263,14 @@ def main(infile=None, zscore_gct = None, out_directory=None, sig_info =None, c=N
             if not os.path.exists(eVIPP_wtspec_out):
                 os.makedirs(eVIPP_wtspec_out)
 
-
             eVIPPspec.main(eVIPP_wtspec_out,args.JSON,args.min_genes,wtspec_infile,eVIPP_files+"/"+mut+"_sig.info", args.c, eVIPP_files+"/"+mut+"_comparisons.tsv", args.num_reps,
             args.ie_filter, args.ie_col, args.i, args.allele_col, args.conn_null, args.conn_thresh,
             args.mut_wt_rep_rank_diff, args.use_c_pval, args.cell_id, args.plate_id, args.ref_allele_mode,
             args.x_thresh, args.y_thresh, args.annotate, args.by_gene_color, args.pdf, args.xmin,
             args.xmax, args.ymin, args.ymax, args.viz_ymin, args.viz_ymax, args.corr_val,args.mut_wt_rep_thresh,args.disting_thresh,args.sparkler_off,args.viz_off)
+
+            if os.path.exists(eVIPP_wtspec_out+"/eVIPP_combined_predict_files.txt"):
+                upset_plot.run(args.JSON,wtspec_infile,eVIPP_wtspec_out+"/eVIPP_combined_predict_files.txt",eVIPP_wtspec_out+"/eVIPP_gene_overlap.png")
 
 
         #####
@@ -562,3 +572,4 @@ def chain(*iterables):
 #################
 
 if __name__ == "__main__": main()
+
