@@ -182,7 +182,7 @@ def main(infile=None, zscore_gct = None, out_directory=None, sig_info =None, c=N
             file_wt = args.out_directory+"/deseq2/"+deseq_control+"_vs_"+wt+"/"+deseq_control+"_v_"+wt+"_deseq2_results.csv"
 
             #get mutation specific and wt specific genes
-            mutspec,wtspec = getSpec.main(wt,mut,deseq_control,file_wt,file_mut)
+            mutspec,wtspec = getSpec.main(wt,mut,deseq_control,file_wt,file_mut,args.out_directory+"/deseq2/figures")
 
             eVIP_gene_expression = pd.read_csv(args.out_directory+"/kallisto_files/combined_kallisto_abundance_genes_filtered_transformed.tsv", sep = "\t")
 
@@ -236,7 +236,7 @@ def main(infile=None, zscore_gct = None, out_directory=None, sig_info =None, c=N
             args.mut_wt_rep_rank_diff, args.use_c_pval, args.cell_id, args.plate_id, args.ref_allele_mode,
             args.x_thresh, args.y_thresh, args.annotate, args.by_gene_color, args.pdf, args.xmin,
             args.xmax, args.ymin, args.ymax, args.viz_ymin, args.viz_ymax, args.corr_val,args.mut_wt_rep_thresh,args.disting_thresh,args.sparkler_off,args.viz_off)
-            
+
 
             if os.path.exists(eVIPP_mutspec_out+"/eVIPP_combined_predict_files.txt"):
                 upset_plot.run(args.JSON,mutspec_infile,eVIPP_mutspec_out+"/eVIPP_combined_predict_files.txt",eVIPP_mutspec_out+"/eVIPP_gene_overlap.png")
@@ -572,4 +572,3 @@ def chain(*iterables):
 #################
 
 if __name__ == "__main__": main()
-

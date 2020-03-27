@@ -33,8 +33,8 @@ def run(json_file,kallisto_spec,eVIPP_predict,output_name):
 
         upsetplot.plot(e ,sort_by='cardinality', sort_categories_by='cardinality',show_counts=True )
         plt.savefig(output_name)
+        plt.clf()
 
 
 if __name__ == "__main__":
     main()
-
