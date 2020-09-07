@@ -34,7 +34,9 @@ def main(wt,mut,control,file_wt,file_mut,outdir):
     print "WT specific genes:", len(wtspec)
     print "common DEG genes:", len(common)
 
-    pvalplot(control_vs_wt_results_deseq2_counts,control_vs_mutant_gene_level_sig,mutspec,wtspec,common,mut,outdir)
+    #to plot pval vs pval for each comparison
+    if control_vs_wt_results_deseq2_counts.shape[0]>0 and control_vs_mutant_gene_level_sig.shape[0]>0:
+        pvalplot(control_vs_wt_results_deseq2_counts,control_vs_mutant_gene_level_sig,mutspec,wtspec,common,mut,outdir)
 
     pvalhisto(control_vs_wt_gene_level_sig,control_vs_mutant_results_deseq2_counts,mut,outdir)
     FChisto(control_vs_wt_results_deseq2_counts,control_vs_mutant_results_deseq2_counts,mut,outdir)
