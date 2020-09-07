@@ -44,6 +44,9 @@ def main(infile=None, zscore_gct = None, out_directory=None, sig_info =None, c=N
 
     parser = argparse.ArgumentParser()
 
+    #from filter gene expression table
+    parser.add_argument("-min_tpm", help = "minimum TPM value for a given gene. If the gene is expressed below this level in all samples, the gene is filtered from the table. DEFAULT=1",default=1,type=float)
+
     #from corr
     parser.add_argument("--infile", help="Input txt file (filtered and log transformed data).")
     parser.add_argument("-zscore_gct", help="Zscore input gct file (use instead of --infile)")
@@ -115,7 +118,7 @@ def main(infile=None, zscore_gct = None, out_directory=None, sig_info =None, c=N
 
     #filtering out low expressed genes and doing log2 transformation
     print("Filtering out low expressed genes and doing log2 transformation...")
-    filterGeneExpressionTable.main(in_table=args.out_directory+"/kallisto_files/combined_kallisto_abundance_genes.tsv",out_table=args.out_directory+"/kallisto_files/combined_kallisto_abundance_genes_filtered_transformed.tsv",x = 1,l=True,reformat_gene = None,fpkms = None,min_fpkm = 1,min_fold_fpkm = None)
+    filterGeneExpressionTable.main(in_table=args.out_directory+"/kallisto_files/combined_kallisto_abundance_genes.tsv",out_table=args.out_directory+"/kallisto_files/combined_kallisto_abundance_genes_filtered_transformed.tsv",x = 1,l=True,reformat_gene = None,fpkms = None,min_fpkm = args.min_tpm, min_fold_fpkm = None)
 
     #run eVIP overall
     overall_eVIP_dir = args.out_directory + "/eVIP_out"
@@ -236,7 +239,7 @@ def main(infile=None, zscore_gct = None, out_directory=None, sig_info =None, c=N
             args.mut_wt_rep_rank_diff, args.use_c_pval, args.cell_id, args.plate_id, args.ref_allele_mode,
             args.x_thresh, args.y_thresh, args.annotate, args.by_gene_color, args.pdf, args.xmin,
             args.xmax, args.ymin, args.ymax, args.viz_ymin, args.viz_ymax, args.corr_val,args.mut_wt_rep_thresh,args.disting_thresh,args.sparkler_off,args.viz_off)
-            
+
 
             if os.path.exists(eVIPP_mutspec_out+"/eVIPP_combined_predict_files.txt"):
                 upset_plot.run(args.JSON,mutspec_infile,eVIPP_mutspec_out+"/eVIPP_combined_predict_files.txt",eVIPP_mutspec_out+"/eVIPP_gene_overlap.png")
@@ -572,4 +575,3 @@ def chain(*iterables):
 #################
 
 if __name__ == "__main__": main()
-
