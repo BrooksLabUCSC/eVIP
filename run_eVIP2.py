@@ -15,7 +15,6 @@ import json
 import pandas as pd
 from pyGeno.tools.parsers.GTFTools import GTFFile
 
-
 #importing eVIP
 from bin import eVIP_corr
 from bin import eVIP_predict
@@ -107,6 +106,7 @@ def main(infile=None, zscore_gct = None, out_directory=None, sig_info =None, c=N
         os.makedirs(out_dir)
 
 
+
     #############################################################################
     ### running overall eVIP from kallisto outputs
 
@@ -185,7 +185,7 @@ def main(infile=None, zscore_gct = None, out_directory=None, sig_info =None, c=N
             file_wt = args.out_directory+"/deseq2/"+deseq_control+"_vs_"+wt+"/"+deseq_control+"_v_"+wt+"_deseq2_results.csv"
 
             #get mutation specific and wt specific genes
-            mutspec,wtspec = getSpec.main(wt,mut,deseq_control,file_wt,file_mut)
+            mutspec,wtspec = getSpec.main(wt,mut,deseq_control,file_wt,file_mut,args.out_directory+"/deseq2/figures")
 
             eVIP_gene_expression = pd.read_csv(args.out_directory+"/kallisto_files/combined_kallisto_abundance_genes_filtered_transformed.tsv", sep = "\t")
 
@@ -279,11 +279,36 @@ def main(infile=None, zscore_gct = None, out_directory=None, sig_info =None, c=N
         #####
         # combine all eVIPP mutation-specific and WT-specific sparklers into a single report
         combine_sparklers.run(args.out_directory + "/eVIPP_out",args.out_directory + "/eVIPP_out/all_eVIPP_sparklers.png")
+        
+        #####
+        # use all mutation eVIPP predict files to make an output with each mutation and pathway prediction
+        #list each directory(mutation)
+        eVIPP_mut_paths = [args.out_directory + "/eVIPP_out/"+dI for dI in os.listdir(args.out_directory + "/eVIPP_out/") if os.path.isdir(os.path.join(args.out_directory + "/eVIPP_out/",dI))]
+
+        #getting wt and mut specific eVIPP predict outputs and removing ones that dont exist
+        mut_spec_files = [ i+"/mutation_specific/eVIPP_combined_predict_files.txt" for i in eVIPP_mut_paths if os.path.isfile(i+"/mutation_specific/eVIPP_combined_predict_files.txt")]
+        wt_spec_files = [ i+"/wt_specific/eVIPP_combined_predict_files.txt" for i in eVIPP_mut_paths if os.path.isfile(i+"/wt_specific/eVIPP_combined_predict_files.txt")]
+
+        mut_spec_combined_df =  make_combined_pathway_df(mut_spec_files)
+        mut_spec_combined_df.to_csv(args.out_directory + "/eVIPP_out/all_mutation_specific_eVIPP_summary.txt",sep="\t")
+
+        wt_spec_combined_df =  make_combined_pathway_df(wt_spec_files)
+        wt_spec_combined_df.to_csv(args.out_directory + "/eVIPP_out/all_wt_specific_eVIPP_summary.txt",sep="\t")
+
+
 
 #############
 # FUNCTIONS #
 #############
 
+def make_combined_pathway_df(file_list):
+    df = pd.concat([pd.read_csv(f,sep =  "\t") for f in file_list])
+    df = df[["Pathway","mut","prediction"]]
+    df = df.set_index("Pathway")
+    df = df.pivot(columns='mut')
+    df.columns = df.columns.droplevel()
+
+    return df
 
 def deseq2_wts(comparisons_dict,cond_to_rep_dict,deseq_control,wts):
     for wt in wts:
