@@ -279,7 +279,7 @@ def main(infile=None, zscore_gct = None, out_directory=None, sig_info =None, c=N
         #####
         # combine all eVIPP mutation-specific and WT-specific sparklers into a single report
         combine_sparklers.run(args.out_directory + "/eVIPP_out",args.out_directory + "/eVIPP_out/all_eVIPP_sparklers.png")
-        
+
         #####
         # use all mutation eVIPP predict files to make an output with each mutation and pathway prediction
         #list each directory(mutation)
@@ -289,11 +289,13 @@ def main(infile=None, zscore_gct = None, out_directory=None, sig_info =None, c=N
         mut_spec_files = [ i+"/mutation_specific/eVIPP_combined_predict_files.txt" for i in eVIPP_mut_paths if os.path.isfile(i+"/mutation_specific/eVIPP_combined_predict_files.txt")]
         wt_spec_files = [ i+"/wt_specific/eVIPP_combined_predict_files.txt" for i in eVIPP_mut_paths if os.path.isfile(i+"/wt_specific/eVIPP_combined_predict_files.txt")]
 
-        mut_spec_combined_df =  make_combined_pathway_df(mut_spec_files)
-        mut_spec_combined_df.to_csv(args.out_directory + "/eVIPP_out/all_mutation_specific_eVIPP_summary.txt",sep="\t")
+        if len(mut_spec_files)> 0:
+            mut_spec_combined_df =  make_combined_pathway_df(mut_spec_files)
+            mut_spec_combined_df.to_csv(args.out_directory + "/eVIPP_out/all_mutation_specific_eVIPP_summary.txt",sep="\t")
 
-        wt_spec_combined_df =  make_combined_pathway_df(wt_spec_files)
-        wt_spec_combined_df.to_csv(args.out_directory + "/eVIPP_out/all_wt_specific_eVIPP_summary.txt",sep="\t")
+        if len(wt_spec_files)> 0:
+            wt_spec_combined_df =  make_combined_pathway_df(wt_spec_files)
+            wt_spec_combined_df.to_csv(args.out_directory + "/eVIPP_out/all_wt_specific_eVIPP_summary.txt",sep="\t")
 
 
 
