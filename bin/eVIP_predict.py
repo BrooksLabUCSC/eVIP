@@ -162,6 +162,7 @@ def main():
                       "mut_wt_rep_pval",
                       "mut_wt_conn_null_pval",
                       "wt_mut_rep_vs_wt_mut_conn_pval",
+                      "kruskal_diff",
                       "mut_wt_rep_c_pval",
                       "mut_wt_conn_null_c_pval",
                       "wt_mut_rep_vs_wt_mut_conn_c_pval",
@@ -183,7 +184,8 @@ def main():
                                                  mut_wt_thresh,
                                                  mut_wt_rep_diff,
                                                  c_thresh,
-                                                 disting_thresh)
+                                                 disting_thresh,
+                                                 float(row["kruskal_diff"]))
             row["prediction"]= prediction
 
         else:
@@ -196,7 +198,8 @@ def main():
                                                  mut_wt_thresh,
                                                  mut_wt_rep_diff,
                                                  c_thresh,
-                                                 disting_thresh)
+                                                 disting_thresh,
+                                                 float(row["kruskal_diff"]))
 
             row["prediction"]= prediction
 
@@ -211,7 +214,7 @@ def main():
 
 def run_main(i=None, o= None, conn_thresh=None, mut_wt_rep_thresh=None,
              mut_wt_rep_rank_diff=None, disting_thresh=None,
-            use_c_pval=None):
+            use_c_pval=None, cond_median_max_diff_thresh=None):
 
     #setting default values
     mut_wt_rep_thresh = float(mut_wt_rep_thresh) if mut_wt_rep_thresh != None else float(0.05)
@@ -238,6 +241,7 @@ def run_main(i=None, o= None, conn_thresh=None, mut_wt_rep_thresh=None,
                       "mut_wt_rep_pval",
                       "mut_wt_conn_null_pval",
                       "wt_mut_rep_vs_wt_mut_conn_pval",
+                      "kruskal_diff",
                       "mut_wt_rep_c_pval",
                       "mut_wt_conn_null_c_pval",
                       "wt_mut_rep_vs_wt_mut_conn_c_pval",
@@ -260,7 +264,9 @@ def run_main(i=None, o= None, conn_thresh=None, mut_wt_rep_thresh=None,
                                                  mut_wt_thresh,
                                                  mut_wt_rep_diff,
                                                  c_thresh,
-                                                 disting_thresh)
+                                                 disting_thresh,
+                                                 cond_median_max_diff_thresh,
+                                                 float(row["kruskal_diff"]))
             row["prediction"]= prediction
 
         else:
@@ -273,7 +279,9 @@ def run_main(i=None, o= None, conn_thresh=None, mut_wt_rep_thresh=None,
                                                  mut_wt_thresh,
                                                  mut_wt_rep_diff,
                                                  c_thresh,
-                                                 disting_thresh)
+                                                 disting_thresh,
+                                                 cond_median_max_diff_thresh,
+                                                 float(row["kruskal_diff"]))
 
             row["prediction"]= prediction
 
@@ -305,7 +313,7 @@ def formatLine(line):
 
 def get_prediction_6(wt_rep, mut_rep, mut_wt_rep_pval,
                      mut_wt_conn, mut_wt_conn_pval, disting_pval,
-                     mut_wt_thresh, mut_wt_rep_diff, c_thresh, disting_thresh):
+                     mut_wt_thresh, mut_wt_rep_diff, c_thresh, disting_thresh, cond_median_max_diff_thresh,cond_median_max_diff):
 
     if disting_pval < disting_thresh:
         if max_diff(wt_rep, mut_rep, mut_wt_conn) < mut_wt_rep_diff:
@@ -318,21 +326,23 @@ def get_prediction_6(wt_rep, mut_rep, mut_wt_rep_pval,
 #           if mut_wt_conn < conn_null_med:
 #               return "DOM-NEG"
 
-        if mut_wt_rep_pval < mut_wt_thresh:
-            if wt_rep < mut_rep:
-                if mut_rep - wt_rep >= mut_wt_rep_diff:
-                    return "GOF"
-                else:
-                    return "COF"
-            elif wt_rep > mut_rep:
-                if wt_rep - mut_rep >= mut_wt_rep_diff:
-                    return "LOF"
+        if cond_median_max_diff > cond_median_max_diff_thresh:
+
+            if mut_wt_rep_pval < mut_wt_thresh:
+                if wt_rep < mut_rep:
+                    if mut_rep - wt_rep >= mut_wt_rep_diff:
+                        return "GOF"
+                    else:
+                        return "COF"
+                elif wt_rep > mut_rep:
+                    if wt_rep - mut_rep >= mut_wt_rep_diff:
+                        return "LOF"
+                    else:
+                        return "COF"
                 else:
                     return "COF"
             else:
                 return "COF"
-        else:
-            return "COF"
 
     if mut_wt_conn_pval < c_thresh:
         return "Neutral"

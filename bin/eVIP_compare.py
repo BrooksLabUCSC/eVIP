@@ -458,7 +458,7 @@ def run_main(sig_info=None, gctx = None, allele_col = None, o = None, r = None,
     # Print header to output file
     output_file_prefix.write("gene\tmut\tmut_rep\twt_rep\tmut_wt_connectivity\t")
     output_file_prefix.write("wt\tcell_line\t")
-    output_file_prefix.write("mut_wt_rep_pval\tmut_wt_conn_null_pval\twt_mut_rep_vs_wt_mut_conn_pval\t")
+    output_file_prefix.write("mut_wt_rep_pval\tmut_wt_conn_null_pval\twt_mut_rep_vs_wt_mut_conn_pval\tkruskal_diff\t")
     output_file_prefix.write("mut_wt_rep_c_pval\tmut_wt_conn_null_c_pval\twt_mut_rep_vs_wt_mut_conn_c_pval\n")
 
     mut_rep_pvals = []
@@ -503,6 +503,32 @@ def run_main(sig_info=None, gctx = None, allele_col = None, o = None, r = None,
         mut_wt_rep_vs_wt_mut_conn_pvals.append(wt_mut_rep_vs_wt_mut_conn_pval)
 
 
+        # print('WT_dict[allele2WT[allele]]["wt_rep_dist"]')
+        # print(WT_dict[allele2WT[allele]]["wt_rep_dist"])
+        # print(median(WT_dict[allele2WT[allele]]["wt_rep_dist"]))
+        #
+        # print("mut_rankpt_dist")
+        # print(mut_rankpt_dist)
+        # print(median(mut_rankpt_dist))
+        #
+        #
+        # print("mut_wt_conn_dist")
+        # print(mut_wt_conn_dist)
+        # print(median(mut_wt_conn_dist))
+
+        medians = []
+
+        medians.append(median(WT_dict[allele2WT[allele]]["wt_rep_dist"]))
+        medians.append(median(mut_rankpt_dist))
+        medians.append(median(mut_wt_conn_dist))
+
+        # print(max(medians))
+        # print(min(medians))
+        #
+        # print("\n")
+        # print(max(medians)-min(medians))
+
+        median_diff = max(medians)-min(medians)
 
         out_elems = [allele2gene[allele],
                      allele,
@@ -513,7 +539,8 @@ def run_main(sig_info=None, gctx = None, allele_col = None, o = None, r = None,
                      allele2cell_id[allele],
                      "%f" % mut_wt_rep_pval,
                      "%f" % conn_pval,
-                     "%f" % wt_mut_rep_vs_wt_mut_conn_pval]
+                     "%f" % wt_mut_rep_vs_wt_mut_conn_pval,
+                     "%f" % median_diff]
         outline = "\t".join(out_elems)
         outlines.append(outline)
 
@@ -532,6 +559,7 @@ def run_main(sig_info=None, gctx = None, allele_col = None, o = None, r = None,
         this_outline += "%f\t" % mut_wt_conn_c_pvals[i]
         this_outline += "%f\n" % mut_wt_rep_vs_wt_mut_conn_c_pvals[i]
 
+
         output_file_prefix.write(this_outline)
 
 
@@ -542,6 +570,11 @@ def run_main(sig_info=None, gctx = None, allele_col = None, o = None, r = None,
 #############
 # FUNCTIONS #
 #############
+def median(lst):
+    n = len(lst)
+    s = sorted(lst)
+    return (sum(s[n//2-1:n//2+1])/2.0, s[n//2])[n % 2] if n else None
+
 def buildWT_dict(this_gctx, allele2distil_id, WT_alleles, replicate_null_dist, num_reps):
     """
     {WT_allele:{"wt_rep": med_wt_rep,

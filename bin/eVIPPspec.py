@@ -21,7 +21,7 @@ def main(out_dir,JSON_file,min_genes,infile,sig_info, c, r, num_reps,
 ie_filter, ie_col, i, allele_col, conn_null, conn_thresh,
 mut_wt_rep_rank_diff, use_c_pval, cell_id, plate_id, ref_allele_mode,
 x_thresh, y_thresh, annotate, by_gene_color, pdf, xmin,
-xmax, ymin, ymax, viz_ymin, viz_ymax, corr_val,mut_wt_rep_thresh,disting_thresh,sparkler_off,viz_off):
+xmax, ymin, ymax, viz_ymin, viz_ymax, corr_val,mut_wt_rep_thresh,disting_thresh,sparkler_off,viz_off,cond_median_max_diff_thresh):
 
 
     #getting used pathways (removing pathways in JSON that there isn't data for)
@@ -34,7 +34,7 @@ xmax, ymin, ymax, viz_ymin, viz_ymax, corr_val,mut_wt_rep_thresh,disting_thresh,
         ie_filter, ie_col, i, allele_col, conn_null, conn_thresh,
         mut_wt_rep_rank_diff, use_c_pval, cell_id, plate_id, ref_allele_mode,
         x_thresh, y_thresh, annotate, by_gene_color, pdf, xmin,
-        xmax, ymin, ymax, viz_ymin, viz_ymax, corr_val,mut_wt_rep_thresh,disting_thresh,sparkler_off,viz_off)
+        xmax, ymin, ymax, viz_ymin, viz_ymax, corr_val,mut_wt_rep_thresh,disting_thresh,sparkler_off,viz_off,cond_median_max_diff_thresh)
 
         summary_file = open(out_dir + "/eVIPP_summary.txt", "w")
         summarize(used_pathways, summary_file,out_dir)
@@ -60,7 +60,7 @@ def JSON_eVIP(used_pathways,out_dir,infile,sig_info, c, r, num_reps,
 ie_filter, ie_col, i, allele_col, conn_null, conn_thresh,
 mut_wt_rep_rank_diff, use_c_pval, cell_id, plate_id, ref_allele_mode,
 x_thresh, y_thresh, annotate, by_gene_color, pdf, xmin,
-xmax, ymin, ymax, viz_ymin, viz_ymax, corr_val,mut_wt_rep_thresh,disting_thresh,sparkler_off,viz_off):
+xmax, ymin, ymax, viz_ymin, viz_ymax, corr_val,mut_wt_rep_thresh,disting_thresh,sparkler_off,viz_off,cond_median_max_diff_thresh):
 
     pways_mut_wt_rep_pvals_from_compare = []
     pways_mut_wt_conn_null_pvals_from_compare = []
@@ -118,7 +118,7 @@ xmax, ymin, ymax, viz_ymin, viz_ymax, corr_val,mut_wt_rep_thresh,disting_thresh,
                                                       conn_null, conn_thresh,mut_wt_rep_rank_diff, use_c_pval,
                                                       cell_id,plate_id, ref_allele_mode,x_thresh, y_thresh,
                                                       annotate, by_gene_color,pdf, xmin,xmax, ymin,
-                                                      ymax, viz_ymin, viz_ymax, corr_val,mut_wt_rep_thresh,disting_thresh,sparkler_off,viz_off)
+                                                      ymax, viz_ymin, viz_ymax, corr_val,mut_wt_rep_thresh,disting_thresh,sparkler_off,viz_off,cond_median_max_diff_thresh)
 
                 else:
                     run_eVIP(pathway_out_file_txt, None, p_out_directory, sig_info, c, r,
@@ -127,7 +127,7 @@ xmax, ymin, ymax, viz_ymin, viz_ymax, corr_val,mut_wt_rep_thresh,disting_thresh,
                              mut_wt_rep_rank_diff, use_c_pval, cell_id, plate_id,
                              ref_allele_mode,
                              x_thresh, y_thresh, annotate, by_gene_color, pdf, xmin,
-                             xmax, ymin, ymax, viz_ymin, viz_ymax, corr_val,mut_wt_rep_thresh,disting_thresh,sparkler_off,viz_off)
+                             xmax, ymin, ymax, viz_ymin, viz_ymax, corr_val,mut_wt_rep_thresh,disting_thresh,sparkler_off,viz_off,cond_median_max_diff_thresh)
 
 
     return(used_pathways)
@@ -242,14 +242,14 @@ def run_eVIP_multiple_testing_pt2(infile=None, zscore_gct = None, out_directory=
          ie_filter=None,ie_col=None, i=None, allele_col=None, conn_null=None, conn_thresh=None,
          mut_wt_rep_rank_diff=None, use_c_pval=None, cell_id=None, plate_id=None, ref_allele_mode=None,
          x_thresh=None, y_thresh=None, annotate=None, by_gene_color=None, pdf=None, xmin=None,
-         xmax=None, ymin=None, ymax=None, viz_ymin=None, viz_ymax=None, corr_val=None,mut_wt_rep_thresh=None,disting_thresh=None,sparkler_off=None,viz_off=None):
+         xmax=None, ymin=None, ymax=None, viz_ymin=None, viz_ymax=None, corr_val=None,mut_wt_rep_thresh=None,disting_thresh=None,sparkler_off=None,viz_off=None,cond_median_max_diff_thresh=None):
 
     sig_gctx_val = out_directory+ "/z_scores.gct"
 
     # print('predicting...')
     run_predict = eVIP_predict.run_main(out_directory+"/adj_compare.txt", out_directory+"/predict", conn_thresh,
                 mut_wt_rep_thresh, mut_wt_rep_rank_diff,
-                disting_thresh, use_c_pval)
+                disting_thresh, use_c_pval,cond_median_max_diff_thresh)
 
 
     if not sparkler_off:
@@ -278,7 +278,7 @@ def run_eVIP(infile=None, zscore_gct = None, out_directory=None, sig_info =None,
          ie_filter=None,ie_col=None, i=None, allele_col=None, conn_null=None, conn_thresh=None,
          mut_wt_rep_rank_diff=None, use_c_pval=None, cell_id=None, plate_id=None, ref_allele_mode=None,
          x_thresh=None, y_thresh=None, annotate=None, by_gene_color=None, pdf=None, xmin=None,
-         xmax=None, ymin=None, ymax=None, viz_ymin=None, viz_ymax=None, corr_val=None,mut_wt_rep_thresh=None,disting_thresh=None,sparkler_off=None,viz_off=None):
+         xmax=None, ymin=None, ymax=None, viz_ymin=None, viz_ymax=None, corr_val=None,mut_wt_rep_thresh=None,disting_thresh=None,sparkler_off=None,viz_off=None,cond_median_max_diff_thresh=None):
 
     #different sig_gctx for exp an z inputs used in viz
 
@@ -300,7 +300,7 @@ def run_eVIP(infile=None, zscore_gct = None, out_directory=None, sig_info =None,
     # print('predicting...')
     run_predict = eVIP_predict.run_main(out_directory+"/compare.txt", out_directory+"/predict", conn_thresh,
                 mut_wt_rep_thresh, mut_wt_rep_rank_diff,
-                disting_thresh, use_c_pval)
+                disting_thresh, use_c_pval,cond_median_max_diff_thresh)
 
 
     if not sparkler_off:
@@ -386,7 +386,7 @@ def make_adj_compare_file(pathway_list, out_directory,eVIPP_adj_pways_mut_wt_rep
 
     column_headers = ["gene","mut","mut_rep", "wt_rep", "mut_wt_connectivity",
                       "wt", "cell_line", "mut_wt_rep_pval","mut_wt_conn_null_pval",
-                      "wt_mut_rep_vs_wt_mut_conn_pval", "mut_wt_rep_c_pval",
+                      "wt_mut_rep_vs_wt_mut_conn_pval","kruskal_diff", "mut_wt_rep_c_pval",
                       "mut_wt_conn_null_c_pval","wt_mut_rep_vs_wt_mut_conn_c_pval"]
 
     for pathway in pathway_list:

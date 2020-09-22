@@ -68,6 +68,10 @@ def main(infile=None, zscore_gct = None, out_directory=None, sig_info =None, c=N
     parser.add_argument("-use_c_pval", action ="store_true", help = "Will use corrected p-value instead of raw p-val")
     parser.add_argument("-cell_id", help = "Optional: Will only look at signatures from this cell line. Helps to filter sig_info file.")
     parser.add_argument("-plate_id", help = "Optional: Will only look at signatures from this plate")
+
+    parser.add_argument("-cond_max_diff_thresh", help = "Threshold for maximum difference between condition medians when determining if variant is not neutral",type=float,default=0.2)
+
+
     #from sparkler
     parser.add_argument("-ref_allele_mode", action ="store_true", help = "Sparkler+Viz: Instead of organizing plots by gene, will use the wt column to determine what are the reference alleles." )
     parser.add_argument("-x_thresh" , help = "Sparkler: Threshold of significance")
@@ -238,7 +242,7 @@ def main(infile=None, zscore_gct = None, out_directory=None, sig_info =None, c=N
             args.ie_filter, args.ie_col, args.i, args.allele_col, args.conn_null, args.conn_thresh,
             args.mut_wt_rep_rank_diff, args.use_c_pval, args.cell_id, args.plate_id, args.ref_allele_mode,
             args.x_thresh, args.y_thresh, args.annotate, args.by_gene_color, args.pdf, args.xmin,
-            args.xmax, args.ymin, args.ymax, args.viz_ymin, args.viz_ymax, args.corr_val,args.mut_wt_rep_thresh,args.disting_thresh,args.sparkler_off,args.viz_off)
+            args.xmax, args.ymin, args.ymax, args.viz_ymin, args.viz_ymax, args.corr_val,args.mut_wt_rep_thresh,args.disting_thresh,args.sparkler_off,args.viz_off,args.cond_max_diff_thresh)
 
 
             if os.path.exists(eVIPP_mutspec_out+"/eVIPP_combined_predict_files.txt"):
@@ -270,7 +274,7 @@ def main(infile=None, zscore_gct = None, out_directory=None, sig_info =None, c=N
             args.ie_filter, args.ie_col, args.i, args.allele_col, args.conn_null, args.conn_thresh,
             args.mut_wt_rep_rank_diff, args.use_c_pval, args.cell_id, args.plate_id, args.ref_allele_mode,
             args.x_thresh, args.y_thresh, args.annotate, args.by_gene_color, args.pdf, args.xmin,
-            args.xmax, args.ymin, args.ymax, args.viz_ymin, args.viz_ymax, args.corr_val,args.mut_wt_rep_thresh,args.disting_thresh,args.sparkler_off,args.viz_off)
+            args.xmax, args.ymin, args.ymax, args.viz_ymin, args.viz_ymax, args.corr_val,args.mut_wt_rep_thresh,args.disting_thresh,args.sparkler_off,args.viz_off,args.cond_max_diff_thresh)
 
             if os.path.exists(eVIPP_wtspec_out+"/eVIPP_combined_predict_files.txt"):
                 upset_plot.run(args.JSON,wtspec_infile,eVIPP_wtspec_out+"/eVIPP_combined_predict_files.txt",eVIPP_wtspec_out+"/eVIPP_gene_overlap.png")
@@ -486,7 +490,7 @@ def run_eVIP(infile=None, zscore_gct = None, out_directory=None, sig_info =None,
     # print('predicting...')
     run_predict = eVIP_predict.run_main(i= out_directory+"/compare.txt", o= out_directory+"/predict", conn_thresh=args.conn_thresh,
                 mut_wt_rep_thresh=args.mut_wt_rep_thresh, mut_wt_rep_rank_diff=args.mut_wt_rep_rank_diff,
-                disting_thresh=args.disting_thresh, use_c_pval=args.use_c_pval)
+                disting_thresh=args.disting_thresh, use_c_pval=args.use_c_pval,cond_median_max_diff_thresh=args.cond_max_diff_thresh)
 
 
     if not args.sparkler_off:
