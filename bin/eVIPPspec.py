@@ -441,7 +441,7 @@ def summarize(pathway_list, output_file,out_dir):
                     continue
                 else:
                     splitLine = line.split()
-                    pred_list.append(splitLine[13])
+                    pred_list.append(splitLine[14])
 
         output_file.write(pathway + "\t" + ("\t").join(pred_list)+"\n")
         #clearing predict list
