@@ -61,15 +61,15 @@ def main(infile=None, zscore_gct = None, out_directory=None, sig_info =None, c=N
     parser.add_argument("-allele_col", help = "Column name in sig_info file that indicates the allele names.DEF=x_mutation_status")
     parser.add_argument("-conn_null", help = " Optional file containing connectivity null values from a previous run. Should end in _conn_null.txt")
     #from predict
-    parser.add_argument("-conn_thresh",help = "P-value threshold for connectivity vs null. DEFAULT=0.05")
-    parser.add_argument("-mut_wt_rep_thresh", help = "P-value threshold for comparison of WT and mut robustness. DEFAULT=0.05")
-    parser.add_argument("-disting_thresh", help = "P-value threshold that tests if mut and wt reps are indistinguishable from each other. DEFAULT=0.05",default=.05,type=float)
+    parser.add_argument("-conn_thresh",help = "P-value threshold for connectivity vs null. DEFAULT=0.1",default=.1,type=float)
+    parser.add_argument("-mut_wt_rep_thresh", help = "P-value threshold for comparison of WT and mut robustness. DEFAULT=0.1",default=.1,type=float)
+    parser.add_argument("-disting_thresh", help = "P-value threshold that tests if mut and wt reps are indistinguishable from each other. DEFAULT=0.1",default=.1,type=float)
     parser.add_argument("-mut_wt_rep_rank_diff", help = "The minimum difference in median rankpoint WT and mut to consider a difference. DEF=0")
     parser.add_argument("-use_c_pval", action ="store_true", help = "Will use corrected p-value instead of raw p-val")
     parser.add_argument("-cell_id", help = "Optional: Will only look at signatures from this cell line. Helps to filter sig_info file.")
     parser.add_argument("-plate_id", help = "Optional: Will only look at signatures from this plate")
 
-    parser.add_argument("-cond_max_diff_thresh", help = "Threshold for maximum difference between condition medians when determining if variant is not neutral",type=float,default=0.2)
+    parser.add_argument("-cond_max_diff_thresh", help = "Threshold for maximum difference between condition correlation medians when determining if variant is not neutral. Default = 0.2",type=float,default=0.2)
 
 
     #from sparkler

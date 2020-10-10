@@ -217,10 +217,10 @@ def run_main(i=None, o= None, conn_thresh=None, mut_wt_rep_thresh=None,
             use_c_pval=None, cond_median_max_diff_thresh=None):
 
     #setting default values
-    mut_wt_rep_thresh = float(mut_wt_rep_thresh) if mut_wt_rep_thresh != None else float(0.05)
+    mut_wt_rep_thresh = float(mut_wt_rep_thresh) if mut_wt_rep_thresh != None else float(.1)
     mut_wt_rep_rank_diff = float(mut_wt_rep_rank_diff) if mut_wt_rep_rank_diff != None else float(0)
-    disting_thresh = float(disting_thresh) if disting_thresh != None else float(0.05)
-    c_thresh = float(conn_thresh) if conn_thresh != None else float(0.05)
+    disting_thresh = float(disting_thresh) if disting_thresh != None else float(.1)
+    c_thresh = float(conn_thresh) if conn_thresh != None else float(.1)
 
     input_table = open(i)
     output = open(o+".txt", "w")

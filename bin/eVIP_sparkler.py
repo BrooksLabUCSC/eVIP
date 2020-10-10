@@ -513,7 +513,7 @@ def eVIP_run_main(pred_file=None, ref_allele_mode=None, y_thresh=None, x_thresh=
     else:
         os.mkdir(out_dir)
         out_dir = os.path.abspath(out_dir)
-        print "Creating output directory: %s" % out_dir
+        # print "Creating output directory: %s" % out_dir
 
     x_thresh = getNegLog10(x_thresh, xmax)
     y_thresh = getNegLog10(y_thresh, ymax)
