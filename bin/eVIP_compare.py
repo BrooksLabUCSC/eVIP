@@ -402,6 +402,10 @@ def run_main(sig_info=None, gctx = None, allele_col = None, o = None, r = None,
     if reference_test_filename:
         ref2test_allele = parseRefTestFile(reference_test_filename)
 
+    if ref2test_allele == None:
+        print("Error reading in comparisons file")
+        sys.exit()
+
     this_gctx = parse(gctx)
     # this_gctx.read()
 
@@ -781,7 +785,7 @@ def parseRefTestFile(reference_test_filename):
             continue
 
         line = formatLine(line)
-        lineList = line.split("\t")
+        lineList = line.split()
 
         updateDictOfLists(ref2test, lineList[0], lineList[1])
 

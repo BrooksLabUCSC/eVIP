@@ -169,7 +169,7 @@ def main(infile=None, zscore_gct = None, out_directory=None, sig_info =None, c=N
             print("Error: Need deseq control. Set with -control ")
             sys.exit()
 
-        comparisons_df = pd.read_csv(args.r, sep="\t")
+        comparisons_df = pd.read_csv(args.r, delim_whitespace=True)
         comparisons_dict = comparisons_df.to_dict('records')
 
         deseq2_muts(comparisons_dict,cond_to_rep_dict,deseq_control)
