@@ -30,6 +30,7 @@ from bin import getSpec
 from bin import eVIPPspec
 from bin import combine_sparklers
 from bin import upset_plot
+from bin import tx2gene
 
 
 ########
@@ -95,10 +96,11 @@ def main(infile=None, zscore_gct = None, out_directory=None, sig_info =None, c=N
     parser.add_argument("-sparkler_off", action ="store_true",help = "Will not perform eVIP sparkler step")
 
     #run_eVIP2
-    parser.add_argument("-input_dir",required=True, help="Path to directory of kallisto outputs")
+    parser.add_argument("-input_dir", help="Path to directory of kallisto outputs")
+    parser.add_argument("-input_gene_tpm", help="Gene tpm table input for eVIP overall prediction")
     parser.add_argument("-gtf", required=True, help="Gtf file used to convert transcript counts to gene counts")
     parser.add_argument("-control", required=False, help="If multiple controls in the controls file, designate which to use for deseq2")
-
+    parser.add_argument("-tx2gene", action ="store_true",required=False, help="Use tximport for transcript to gene conversion when using -input_dir")
 
     global args
     args = parser.parse_args()
@@ -110,15 +112,26 @@ def main(infile=None, zscore_gct = None, out_directory=None, sig_info =None, c=N
         os.makedirs(out_dir)
 
 
-
     #############################################################################
     ### running overall eVIP from kallisto outputs
 
-    #combining kallisto abundance files into one file
-    combined_kallisto_transcript_df = kallisto_process()
+    if args.input_dir:
 
-    #combining to gene level
-    transcript_to_gene_counts(combined_kallisto_transcript_df)
+        #combining kallisto abundance files into one file
+        combined_kallisto_transcript_df,all_samples = kallisto_process()
+
+        if args.tx2gene:
+            # new version using tximport to combine kallisto into gene counts using kallisto directories
+            tx2gene.main(outDir=args.out_directory+"/kallisto_files/combined_kallisto_abundance_genes.tsv", inDir=args.input_dir, sampleList = all_samples )
+
+        else:
+            #combining to gene level the original way
+            transcript_to_gene_counts(combined_kallisto_transcript_df)
+
+    #if input gene tpm
+    if args.input_gene_tpm:
+        filterGeneExpressionTable.main(in_table=args.input_gene_tpm,out_table=args.out_directory+"/kallisto_files/combined_kallisto_abundance_genes_filtered_transformed.tsv",x = 1,l=True,reformat_gene = None,fpkms = None,min_fpkm = args.min_tpm, min_fold_fpkm = None)
+
 
     #filtering out low expressed genes and doing log2 transformation
     print("Filtering out low expressed genes and doing log2 transformation...")
@@ -142,7 +155,7 @@ def main(infile=None, zscore_gct = None, out_directory=None, sig_info =None, c=N
     #############################################################################
     ### eVIP Pathways
 
-    if args.eVIPP:
+    if args.eVIPP and args.input_dir:
 
         print ("Running eVIP Pathways...")
 
@@ -462,7 +475,7 @@ def kallisto_process():
 
     data.to_csv(args.out_directory+"/kallisto_files/combined_kallisto_abundance.tsv", sep="\t")
 
-    return data
+    return data , samples
 
 def run_eVIP(infile=None, zscore_gct = None, out_directory=None, sig_info =None, c=None, r=None, num_reps=None,
          ie_filter=None,ie_col=None, i=None, allele_col=None, conn_null=None, conn_thresh=None,

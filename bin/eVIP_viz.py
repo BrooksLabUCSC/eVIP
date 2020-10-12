@@ -204,7 +204,7 @@ def main():
     else:
         os.mkdir(options.out_dir)
         out_dir = os.path.abspath(options.out_dir)
-        print "Creating output directory: %s" % out_dir
+        # print "Creating output directory: %s" % out_dir
 
     pdf = options.pdf
     use_c_pval = options.use_c_pval
@@ -388,7 +388,7 @@ def eVIP_run_main(pred_file=None, sig_info =None, gctx=None,
     else:
         os.mkdir(out_dir)
         out_dir = os.path.abspath(out_dir)
-        print "Creating output directory: %s" % out_dir
+        # print "Creating output directory: %s" % out_dir
 
     sig_info = open(sig_info)
     null_conn = getNullConnDist(null_conn)
