@@ -415,7 +415,9 @@ def make_adj_compare_file(pathway_list, out_directory,eVIPP_adj_pways_mut_wt_rep
                     m += 1
             for item in eVIPP_adj_pways_wt_mut_rep_vs_wt_mut_conn_c_pvals_from_compare:
                 if pathway in item:
+                    line['wt_mut_rep_vs_wt_mut_conn_c_pval'] = item[0][l]
                     l += 1
+
             file_writer.writerow(line)
 def summarize(pathway_list, output_file,out_dir):
     #creates a simple summary file of just variant predictions for each pathway
