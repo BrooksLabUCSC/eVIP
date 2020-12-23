@@ -17,7 +17,7 @@ from bin import eVIP_viz
 from bin import eVIP_compare
 from bin import eVIPP_sparkler
 
-def main(out_dir,JSON_file,min_genes,infile,sig_info, c, r, num_reps,
+def main(out_dir,JSON_file,gmt,min_genes,infile,sig_info, c, r, num_reps,
 ie_filter, ie_col, i, allele_col, conn_null, conn_thresh,
 mut_wt_rep_rank_diff, use_c_pval, cell_id, plate_id, ref_allele_mode,
 x_thresh, y_thresh, annotate, by_gene_color, pdf, xmin,
@@ -25,7 +25,7 @@ xmax, ymin, ymax, viz_ymin, viz_ymax, corr_val,mut_wt_rep_thresh,disting_thresh,
 
 
     #getting used pathways (removing pathways in JSON that there isn't data for)
-    pway_dict, used_pathways = JSON_pway(JSON_file,out_dir,infile,min_genes)
+    pway_dict, used_pathways = JSON_pway(JSON_file,gmt,out_dir,infile,min_genes)
 
     if len(used_pathways) > 0:
 
@@ -132,12 +132,22 @@ xmax, ymin, ymax, viz_ymin, viz_ymax, corr_val,mut_wt_rep_thresh,disting_thresh,
 
     return(used_pathways)
 
-def JSON_pway(JSON_file,out_dir,infile,min_genes):
+def JSON_pway(JSON_file,gmt,out_dir,infile,min_genes):
     pway_dict = {}
-    with open(JSON_file, "rb") as JSON:
-        old_dict = json.load(JSON)
-        #creating new dict to remove pathways with None values (no genes were in the pathway)
-        pway_dict = {k: v for k, v in old_dict.iteritems() if v is not None}
+
+    if JSON_file:
+        with open(JSON_file, "rb") as JSON:
+            old_dict = json.load(JSON)
+            #creating new dict to remove pathways with None values (no genes were in the pathway)
+            pway_dict = {k: v for k, v in old_dict.iteritems() if v is not None}
+
+
+    if gmt:
+        with open(gmt) as gmt_:
+            content = gmt_.read().splitlines()
+            lines = [i.split("\t") for i in content]
+            pway_dict = {item[0]: item[2:] for item in lines }
+
 
     used_pathways = []
 

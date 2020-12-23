@@ -89,8 +89,9 @@ def main(infile=None, zscore_gct = None, out_directory=None, sig_info =None, c=N
     parser.add_argument("-viz_ymax", help = "Viz: Maximum y-value of rep value. DEF=100")
     parser.add_argument("-corr_val", help = "Viz: String used to label the correlation value. DEF= 'row median rankpoints' ")
     #eVIPP
-    parser.add_argument("-eVIPP", action ="store_true", help="Use this option when doing pathway analysis, must also have JSON file ")
+    parser.add_argument("-eVIPP", action ="store_true", help="Use this option when doing pathway analysis, must also have gmt or JSON file ")
     parser.add_argument("-JSON", help= "JSON file created by create_pathway_JSON.py. Contains dictionary of pathways and the associated ids")
+    parser.add_argument("-gmt", help= "Gene set file in .gmt format")
     parser.add_argument("-min_genes", help = "Minimum amount of pathway genes found in data to run eVIPP on. DEF = 5")
     parser.add_argument("-viz_off", action ="store_true", help = "Will not perform eVIP viz step")
     parser.add_argument("-sparkler_off", action ="store_true",help = "Will not perform eVIP sparkler step")
@@ -251,7 +252,7 @@ def main(infile=None, zscore_gct = None, out_directory=None, sig_info =None, c=N
                 os.makedirs(eVIPP_mutspec_out)
 
 
-            eVIPPspec.main(eVIPP_mutspec_out,args.JSON,args.min_genes,mutspec_infile,eVIPP_files+"/"+mut+"_sig.info", args.c, eVIPP_files+"/"+mut+"_comparisons.tsv", args.num_reps,
+            eVIPPspec.main(eVIPP_mutspec_out,args.JSON,args.gmt,args.min_genes,mutspec_infile,eVIPP_files+"/"+mut+"_sig.info", args.c, eVIPP_files+"/"+mut+"_comparisons.tsv", args.num_reps,
             args.ie_filter, args.ie_col, args.i, args.allele_col, args.conn_null, args.conn_thresh,
             args.mut_wt_rep_rank_diff, args.use_c_pval, args.cell_id, args.plate_id, args.ref_allele_mode,
             args.x_thresh, args.y_thresh, args.annotate, args.by_gene_color, args.pdf, args.xmin,
@@ -259,7 +260,7 @@ def main(infile=None, zscore_gct = None, out_directory=None, sig_info =None, c=N
 
 
             if os.path.exists(eVIPP_mutspec_out+"/eVIPP_combined_predict_files.txt"):
-                upset_plot.run(args.JSON,mutspec_infile,eVIPP_mutspec_out+"/eVIPP_combined_predict_files.txt",eVIPP_mutspec_out+"/eVIPP_gene_overlap.png")
+                upset_plot.run(args.JSON,args.gmt,mutspec_infile,eVIPP_mutspec_out+"/eVIPP_combined_predict_files.txt",eVIPP_mutspec_out+"/eVIPP_gene_overlap.png")
 
 
             ######################################################################
@@ -283,14 +284,14 @@ def main(infile=None, zscore_gct = None, out_directory=None, sig_info =None, c=N
             if not os.path.exists(eVIPP_wtspec_out):
                 os.makedirs(eVIPP_wtspec_out)
 
-            eVIPPspec.main(eVIPP_wtspec_out,args.JSON,args.min_genes,wtspec_infile,eVIPP_files+"/"+mut+"_sig.info", args.c, eVIPP_files+"/"+mut+"_comparisons.tsv", args.num_reps,
+            eVIPPspec.main(eVIPP_wtspec_out,args.JSON,args.gmt,args.min_genes,wtspec_infile,eVIPP_files+"/"+mut+"_sig.info", args.c, eVIPP_files+"/"+mut+"_comparisons.tsv", args.num_reps,
             args.ie_filter, args.ie_col, args.i, args.allele_col, args.conn_null, args.conn_thresh,
             args.mut_wt_rep_rank_diff, args.use_c_pval, args.cell_id, args.plate_id, args.ref_allele_mode,
             args.x_thresh, args.y_thresh, args.annotate, args.by_gene_color, args.pdf, args.xmin,
             args.xmax, args.ymin, args.ymax, args.viz_ymin, args.viz_ymax, args.corr_val,args.mut_wt_rep_thresh,args.disting_thresh,args.sparkler_off,args.viz_off,args.cond_max_diff_thresh)
 
             if os.path.exists(eVIPP_wtspec_out+"/eVIPP_combined_predict_files.txt"):
-                upset_plot.run(args.JSON,wtspec_infile,eVIPP_wtspec_out+"/eVIPP_combined_predict_files.txt",eVIPP_wtspec_out+"/eVIPP_gene_overlap.png")
+                upset_plot.run(args.JSON,args.gmt,wtspec_infile,eVIPP_wtspec_out+"/eVIPP_combined_predict_files.txt",eVIPP_wtspec_out+"/eVIPP_gene_overlap.png")
 
 
         #####
@@ -524,94 +525,6 @@ def run_eVIP(infile=None, zscore_gct = None, out_directory=None, sig_info =None,
                 sig_gctx = sig_gctx_val, ref_allele_mode = args.ref_allele_mode, null_conn = null_conn,
                 out_dir = out_directory+"/viz",ymin = args.viz_ymin, ymax= args.viz_ymax, allele_col = args.allele_col, use_c_pval = args.use_c_pval,
                  pdf = args.pdf, cell_id = args.cell_id, plate_id = args.plate_id, corr_val_str= args.corr_val)
-
-def make_adj_compare_file(pathway_list, out_directory,eVIPP_adj_pways_mut_wt_rep_c_pvals_from_compare,eVIPP_adj_pways_mut_wt_conn_null_c_pvals_from_compare,eVIPP_adj_pways_wt_mut_rep_vs_wt_mut_conn_c_pvals_from_compare):
-
-    column_headers = ["gene","mut","mut_rep", "wt_rep", "mut_wt_connectivity",
-                      "wt", "cell_line", "mut_wt_rep_pval","mut_wt_conn_null_pval",
-                      "wt_mut_rep_vs_wt_mut_conn_pval", "mut_wt_rep_c_pval",
-                      "mut_wt_conn_null_c_pval","wt_mut_rep_vs_wt_mut_conn_c_pval"]
-
-    for pathway in pathway_list:
-        #new file
-        adj_compare = open(out_directory + "/" + pathway + "_eVIPP_outputs/adj_compare.txt", "w")
-
-        #writing header to new file
-        file_writer = csv.DictWriter(adj_compare, delimiter="\t", fieldnames=column_headers)
-        file_writer.writeheader()
-
-        #opening the original compare file
-        compare_file = open(out_directory + "/" +pathway+ "_eVIPP_outputs/compare.txt", "r")
-        file_reader = csv.DictReader(compare_file, delimiter="\t")
-        n = 0
-        m = 0
-        l = 0
-
-        for line in file_reader:
-            for item in eVIPP_adj_pways_mut_wt_rep_c_pvals_from_compare:
-                if pathway in item:
-                    line['mut_wt_rep_c_pval'] = item[0][n]
-                    n+=1
-            for item in eVIPP_adj_pways_mut_wt_conn_null_c_pvals_from_compare:
-                if pathway in item:
-                    line['mut_wt_conn_null_c_pval'] = item[0][m]
-                    m += 1
-            for item in eVIPP_adj_pways_wt_mut_rep_vs_wt_mut_conn_c_pvals_from_compare:
-                if pathway in item:
-                    l += 1
-            file_writer.writerow(line)
-
-def mkdir_p(path):
-    try:
-        os.makedirs(path)
-    except OSError as exc:
-        if exc.errno == errno.EEXIST and os.path.isdir(path):
-            pass
-        else:
-            raise
-
-def formatLine(line):
-    line = line.replace("\r", "")
-    line = line.replace("\n", "")
-    return line
-
-def grouper(iterable, n, fillvalue=None):
-    args = [iter(iterable)] * n
-    return izip_longest(fillvalue=fillvalue, *args)
-
-class ZipExhausted(Exception):
-    pass
-
-def izip_longest(*args, **kwds):
-    fillvalue = kwds.get('fillvalue')
-    counter = [len(args) - 1]
-    def sentinel():
-        if not counter[0]:
-            raise ZipExhausted
-        counter[0] -= 1
-        yield fillvalue
-    fillers = repeat(fillvalue)
-    iterators = [chain(it, sentinel(), fillers) for it in args]
-    try:
-        while iterators:
-            yield tuple(map(next, iterators))
-    except ZipExhausted:
-        pass
-
-def repeat(object, times=None):
-    # repeat(10, 3) --> 10 10 10
-    if times is None:
-        while True:
-            yield object
-    else:
-        for i in xrange(times):
-            yield object
-
-def chain(*iterables):
-    # chain('ABC', 'DEF') --> A B C D E F
-    for it in iterables:
-        for element in it:
-            yield element
 
 
 #################
