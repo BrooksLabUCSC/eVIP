@@ -57,7 +57,7 @@ File to list the controls in the experiment. The control name should match the "
 ### Required input files for eVIP Pathway analysis
 When running eVIP Pathways (using `-eVIPP`) additional files are required.
 
-`-JSON` JSON file created by create_pathway_JSON.py. Contains dictionary of pathways and the associated gene ids.
+`-gmt` .gmt file with pathways and the associated genes
 
 `-gtf ` Gtf file used to convert transcript counts to gene counts
 
@@ -90,27 +90,31 @@ To run the eVIP pipeline, use run_eVIP.py. We recommend the input data (--infile
                    [-by_gene_color BY_GENE_COLOR] [-pdf PDF] [-xmin XMIN]
                    [-xmax XMAX] [-ymin YMIN] [-ymax YMAX] [-viz_ymin VIZ_YMIN]
                    [-viz_ymax VIZ_YMAX] [-corr_val CORR_VAL] [-eVIPP]
-                   [-JSON JSON] [-min_genes MIN_GENES] [-viz_off]
+                   [-JSON JSON] [-gmt gmt][-min_genes MIN_GENES] [-viz_off]
                    [-sparkler_off]`
 
 ### eVIP2 Usage
 
-`run_eVIP2.py [-h] [--infile INFILE] [-zscore_gct ZSCORE_GCT]
-                    -out_directory OUT_DIRECTORY -sig_info SIG_INFO -c C -r R
-                    -num_reps NUM_REPS [-ie_filter IE_FILTER] [-ie_col IE_COL]
-                    [-i I] [-allele_col ALLELE_COL] [-conn_null CONN_NULL]
+`usage: run_eVIP2.py [-h] [-min_tpm MIN_TPM] [--infile INFILE]
+                    [-zscore_gct ZSCORE_GCT] -out_directory OUT_DIRECTORY
+                    -sig_info SIG_INFO -c C -r R -num_reps NUM_REPS
+                    [-ie_filter IE_FILTER] [-ie_col IE_COL] [-i I]
+                    [-allele_col ALLELE_COL] [-conn_null CONN_NULL]
                     [-conn_thresh CONN_THRESH]
                     [-mut_wt_rep_thresh MUT_WT_REP_THRESH]
                     [-disting_thresh DISTING_THRESH]
                     [-mut_wt_rep_rank_diff MUT_WT_REP_RANK_DIFF] [-use_c_pval]
-                    [-cell_id CELL_ID] [-plate_id PLATE_ID] [-ref_allele_mode]
-                    [-x_thresh X_THRESH] [-y_thresh Y_THRESH] [-annotate]
+                    [-cell_id CELL_ID] [-plate_id PLATE_ID]
+                    [-cond_max_diff_thresh COND_MAX_DIFF_THRESH]
+                    [-ref_allele_mode] [-x_thresh X_THRESH]
+                    [-y_thresh Y_THRESH] [-annotate]
                     [-by_gene_color BY_GENE_COLOR] [-pdf PDF] [-xmin XMIN]
                     [-xmax XMAX] [-ymin YMIN] [-ymax YMAX]
                     [-viz_ymin VIZ_YMIN] [-viz_ymax VIZ_YMAX]
-                    [-corr_val CORR_VAL] [-eVIPP] [-JSON JSON]
+                    [-corr_val CORR_VAL] [-eVIPP] [-JSON JSON] [-gmt GMT]
                     [-min_genes MIN_GENES] [-viz_off] [-sparkler_off]
-                    -input_dir INPUT_DIR -gtf GTF [-control CONTROL]`
+                    [-input_dir INPUT_DIR] [-input_gene_tpm INPUT_GENE_TPM]
+                    -gtf GTF [-control CONTROL] [-tx2gene]`
 
 ### Output files
 
@@ -136,7 +140,7 @@ To run the eVIP pipeline, use run_eVIP.py. We recommend the input data (--infile
 
 eVIP will create a folder named "eVIP_out" containing the results to the overall functional eVIP analysis. The results file is "predict.txt" and different visualizations can be found in the "sparkler_plots" and "viz" directories.
 
-When running eVIP Pathways (`-eVIPP`, `-JSON`, and `-gtf`), the results will be in "eVIPP_out", which will contain be a directory for each mutation. For each mutation, eVIPP is run separately using the wt-specific and mutation-specific genes. The  eVIPP_combined_predict_files.txt  file contains all the results from the individual pathway files combined into one file. eVIPP_summary.txt summarizes  the results, showing the pathway  and its functional prediction. The eVIPP sparkler plot is a combined  visual representation of all the pathway predictions for that mutation. The directory  structure is the same for the wt_specific eVIPP results.
+When running eVIP Pathways (`-eVIPP`, `-gmt`, and `-gtf`), the results will be in "eVIPP_out", which will contain be a directory for each mutation. For each mutation, eVIPP is run separately using the wt-specific and mutation-specific genes. The  eVIPP_combined_predict_files.txt  file contains all the results from the individual pathway files combined into one file. eVIPP_summary.txt summarizes  the results, showing the pathway  and its functional prediction. The eVIPP sparkler plot is a combined  visual representation of all the pathway predictions for that mutation. The directory  structure is the same for the wt_specific eVIPP results.
 
 
 ### Tips
@@ -212,6 +216,7 @@ If plots made by eVIP_viz.py are blank, adjust the min and max.
                                 have JSON file
           -JSON JSON            JSON file created by create_pathway_JSON.py. Contains
                                 dictionary of pathways and the associated ids
+          -gmt GMT              Gene set file in .gmt format
           -min_genes MIN_GENES  Minimum amount of pathway genes found in data to run
                                 eVIPP on. DEF = 5
           -viz_off              Will not perform eVIP viz step
@@ -260,5 +265,5 @@ Download kallisto files :
 
 #### Run eVIP2
 
-`python run_eVIP2.py -input_dir tutorial_files/RNF43_kallisto_outputs -out_directory tutorial_files/eVIP2_out -sig_info tutorial_files/RNF43_sig.info -c tutorial_files/controls.grp -r tutorial_files/comparisons.tsv -by_gene_color tutorial_files/RNF43_gene_label.tsv -allele_col allele -ie_col 293_ie -num_reps 4 -x_thresh 1.3 -y_thresh 1.3  -ymin -2 -ymax 4 -corr_val "spearman" -use_c_pval -eVIPP -JSON tutorial_files/hallmark.all.v6.0.symbols.json -min_genes 10 -annotate -gtf tutorial_files/Homo_sapiens.GRCh38.87.gtf`
+`python run_eVIP2.py -input_dir tutorial_files/RNF43_kallisto_outputs -out_directory tutorial_files/eVIP2_out -sig_info tutorial_files/RNF43_sig.info -c tutorial_files/controls.grp -r tutorial_files/comparisons.tsv -by_gene_color tutorial_files/RNF43_gene_label.tsv -allele_col allele -ie_col 293_ie -num_reps 4 -x_thresh 1.3 -y_thresh 1.3  -ymin -2 -ymax 4 -corr_val "spearman" -use_c_pval -eVIPP -gmt tutorial_files/tutorial_files/h.all.v6.0.symbols.gmt -min_genes 10 -annotate -gtf tutorial_files/Homo_sapiens.GRCh38.87.gtf`
 `
