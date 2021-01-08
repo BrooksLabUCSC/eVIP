@@ -28,9 +28,9 @@ def main(infile=None, zscore_gct = None, out_directory=None, sig_info =None,
 
     parser = argparse.ArgumentParser()
 
-    parser.add_argument("-l1000", action ="store_true",
-                        help = """Using l1000 data as input. Must use -zscore_gct""")
-
+    parser.add_argument("-wtcs_gct",
+                        help="""L1000 self correlation weighted scores in gct
+                        format. If not provided""")
 
     #from corr
     parser.add_argument("--infile",
@@ -124,39 +124,27 @@ def main(infile=None, zscore_gct = None, out_directory=None, sig_info =None,
     parser.add_argument("-corr_val",
                         help = """Viz: String used to label the correlation
                         value. DEF= 'row median rankpoints' """)
-
+    #other
     parser.add_argument("-sparkler_off", action ="store_true",
                         help = "Will not perform eVIP sparkler step")
     parser.add_argument("-viz_off", action ="store_true",
                         help = "Will not perform eVIP viz step")
 
-
     global args
     args = parser.parse_args()
 
     #make eVIP output directory
-    global out_dir
-    out_dir = args.out_directory
-    if not os.path.exists(out_dir):
-        os.makedirs(out_dir)
+    eVIP_dir = args.out_directory + "/eVIP_out"
+    if not os.path.exists(eVIP_dir):
+        os.makedirs(eVIP_dir)
 
-
-        eVIP_dir = out_dir + "/eVIP_out"
-        if not os.path.exists(eVIP_dir):
-            os.makedirs(eVIP_dir)
-
-
-
-
-
-    if args.l1000:
-
-        run_eVIP(args.infile, args.zscore_gct, eVIP_dir, args.sig_info, args.c,
-                args.r, args.num_reps,args.ie_filter, args.ie_col, args.i,
-                args.allele_col, args.conn_null, args.conn_thresh,
-                args.mut_wt_rep_rank_diff, args.use_c_pval, args.cell_id, args.plate_id, args.ref_allele_mode,
-                 args.x_thresh, args.y_thresh, args.annotate, args.by_gene_color, args.pdf, args.xmin,
-                 args.xmax, args.ymin, args.ymax, args.viz_ymin, args.viz_ymax, args.corr_val)
+    run_eVIP(args.wtcs_gct, args.infile, args.zscore_gct, eVIP_dir,
+            args.sig_info, args.c, args.r, args.num_reps,args.ie_filter,
+            args.ie_col, args.i, args.allele_col, args.conn_null, args.conn_thresh,
+            args.mut_wt_rep_rank_diff, args.use_c_pval, args.cell_id, args.plate_id,
+            args.ref_allele_mode,args.x_thresh, args.y_thresh, args.annotate,
+            args.by_gene_color, args.pdf, args.xmin,args.xmax, args.ymin,
+            args.ymax, args.viz_ymin, args.viz_ymax, args.corr_val)
 
 ############
 # END_MAIN #
@@ -165,44 +153,57 @@ def main(infile=None, zscore_gct = None, out_directory=None, sig_info =None,
 #############
 # FUNCTIONS #
 #############
-def run_eVIP(infile=None, zscore_gct = None, out_directory=None,
-            sig_info =None, c=None, r=None, num_reps=None,
-         ie_filter=None,ie_col=None, i=None, allele_col=None, conn_null=None, conn_thresh=None,
-         mut_wt_rep_rank_diff=None, use_c_pval=None, cell_id=None, plate_id=None, ref_allele_mode=None,
-         x_thresh=None, y_thresh=None, annotate=None, by_gene_color=None, pdf=None, xmin=None,
-         xmax=None, ymin=None, ymax=None, viz_ymin=None, viz_ymax=None, corr_val=None):
+def run_eVIP(wtcs_gct = None, infile=None, zscore_gct = None, out_directory=None,
+            sig_info =None, c=None, r=None, num_reps=None, ie_filter=None,
+            ie_col=None, i=None, allele_col=None, conn_null=None, conn_thresh=None,
+            mut_wt_rep_rank_diff=None, use_c_pval=None, cell_id=None, plate_id=None,
+            ref_allele_mode=None,x_thresh=None, y_thresh=None, annotate=None,
+            by_gene_color=None, pdf=None, xmin=None,xmax=None, ymin=None,
+            ymax=None, viz_ymin=None, viz_ymax=None, corr_val=None):
 
 
-
-    #different sig_gctx for exp an z inputs used in viz
+    #different sig_gctx for exp an z inputs needed in evip_viz
     if args.infile :
         sig_gctx_val = out_directory+ "/z_scores.gct"
     if args.zscore_gct :
         sig_gctx_val = args.zscore_gct
 
+    #if correlation wtcs matrix, isnt created create spearman rank  corr matrix
+    if  args.wtcs_gct:
+        wtcs_gct_file = args.wtcs_gct
 
-    # run eVIP_corr.py
-    print('calculating correlations...')
-    run_corr = eVIP_corr.run_main(input=infile,zscore_gct=zscore_gct, out_dir= out_directory)
+    else:
+        print('calculating correlations...')
+        run_corr = eVIP_corr.run_main(input=infile,zscore_gct=zscore_gct,
+                                            out_dir= out_directory)
+        wtcs_gct_file = out_directory+"/spearman_rank_matrix.gct"
 
     print('comparing...')
-    run_compare = eVIP_compare.run_main(sig_info=sig_info, gctx = out_directory+"/spearman_rank_matrix.gct",
-                allele_col = args.allele_col, o= out_directory+"/compare", r = args.r,
-             c = args.c, i = args.i, conn_null = args.conn_null, ie_col = args.ie_col,
-             ie_filter = args.ie_filter, num_reps = args.num_reps, cell_id = args.cell_id, plate_id = args.plate_id)
+    run_compare = eVIP_compare.run_main(sig_info=sig_info, gctx = wtcs_gct_file,
+                allele_col = args.allele_col, o= out_directory+"/compare",
+                r = args.r, c = args.c, i = args.i, conn_null = args.conn_null,
+                ie_col = args.ie_col, ie_filter = args.ie_filter,
+                num_reps = args.num_reps, cell_id = args.cell_id,
+                plate_id = args.plate_id)
 
     print('predicting...')
-    run_predict = eVIP_predict.run_main(i= out_directory+"/compare.txt", o= out_directory+"/predict", conn_thresh=args.conn_thresh,
-                mut_wt_rep_thresh=args.mut_wt_rep_thresh, mut_wt_rep_rank_diff=args.mut_wt_rep_rank_diff,
+    run_predict = eVIP_predict.run_main(i= out_directory+"/compare.txt",
+                o= out_directory+"/predict", conn_thresh=args.conn_thresh,
+                mut_wt_rep_thresh=args.mut_wt_rep_thresh,
+                mut_wt_rep_rank_diff=args.mut_wt_rep_rank_diff,
                 disting_thresh=args.disting_thresh, use_c_pval=args.use_c_pval)
 
 
     if not args.sparkler_off:
         print "making sparkler plots..."
-        run_sparkler = eVIP_sparkler.eVIP_run_main(pred_file = out_directory+"/predict.txt", ref_allele_mode=args.ref_allele_mode,
+        run_sparkler = eVIP_sparkler.eVIP_run_main(
+                pred_file = out_directory+"/predict.txt",
+                ref_allele_mode=args.ref_allele_mode,
                 y_thresh = args.y_thresh , x_thresh = args.x_thresh,
-                use_c_pval= args.use_c_pval,annotate=args.annotate, by_gene_color= args.by_gene_color, pdf= args.pdf,
-                xmin= args.xmin, xmax = args.xmax, ymin = args.ymin, ymax = args.ymax, out_dir = out_directory+"/sparkler_plots")
+                use_c_pval= args.use_c_pval,annotate=args.annotate,
+                by_gene_color= args.by_gene_color, pdf= args.pdf,
+                xmin= args.xmin, xmax = args.xmax, ymin = args.ymin,
+                ymax = args.ymax, out_dir = out_directory+"/sparkler_plots")
 
     if not args.viz_off:
         print "making visualizations..."
@@ -211,10 +212,14 @@ def run_eVIP(infile=None, zscore_gct = None, out_directory=None,
         else:
             null_conn = out_directory + "/compare_conn_null.txt"
 
-        run_viz = eVIP_viz.eVIP_run_main(pred_file= out_directory+"/predict.txt", sig_info = args.sig_info, gctx=out_directory+"/spearman_rank_matrix.gct",
-                sig_gctx = sig_gctx_val, ref_allele_mode = args.ref_allele_mode, null_conn = null_conn,
-                out_dir = out_directory+"/viz",ymin = args.viz_ymin, ymax= args.viz_ymax, allele_col = args.allele_col, use_c_pval = args.use_c_pval,
-                 pdf = args.pdf, cell_id = args.cell_id, plate_id = args.plate_id, corr_val_str= args.corr_val)
+        run_viz = eVIP_viz.eVIP_run_main(pred_file= out_directory+"/predict.txt",
+                sig_info = args.sig_info, gctx=wtcs_gct_file,
+                sig_gctx = sig_gctx_val, ref_allele_mode = args.ref_allele_mode,
+                null_conn = null_conn,out_dir = out_directory+"/viz",
+                ymin = args.viz_ymin, ymax= args.viz_ymax,
+                allele_col = args.allele_col, use_c_pval = args.use_c_pval,
+                pdf = args.pdf, cell_id = args.cell_id, plate_id = args.plate_id,
+                corr_val_str= args.corr_val)
 
 
 #################
