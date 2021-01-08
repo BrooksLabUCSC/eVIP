@@ -1,12 +1,7 @@
 #!/usr/bin/python
-import sys
 import argparse
 import os
-import errno
-import csv
-import itertools
 import rpy2.robjects as robjects
-import json
 
 #importing eVIP
 from bin import eVIP_corr
