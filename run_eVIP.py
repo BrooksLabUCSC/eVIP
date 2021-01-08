@@ -19,28 +19,50 @@ from bin import eVIPP_sparkler
 ########
 # MAIN #
 ########
-def main(infile=None, zscore_gct = None, out_directory=None, sig_info =None, c=None, r=None, num_reps=None,
-         ie_filter=None,ie_col=None, i=None, allele_col=None, conn_null=None, conn_thresh=None,
-         mut_wt_rep_rank_diff=None, use_c_pval=None, cell_id=None, plate_id=None, ref_allele_mode=None,
-         x_thresh=None, y_thresh=None, annotate=None, by_gene_color=None, pdf=None, xmin=None,
-         xmax=None, ymin=None, ymax=None, viz_ymin=None, viz_ymax=None, corr_val=None):
+def main(infile=None, zscore_gct = None, out_directory=None, sig_info =None,
+            c=None, r=None, num_reps=None,ie_filter=None,ie_col=None, i=None,
+            allele_col=None, conn_null=None, conn_thresh=None,
+            mut_wt_rep_rank_diff=None, use_c_pval=None, cell_id=None,
+            plate_id=None, ref_allele_mode=None,x_thresh=None, y_thresh=None,
+            annotate=None, by_gene_color=None, pdf=None, xmin=None,xmax=None,
+            ymin=None, ymax=None, viz_ymin=None, viz_ymax=None, corr_val=None):
 
     parser = argparse.ArgumentParser()
 
+    parser.add_argument("-l1000", action ="store_true",
+                        help = """Using l1000 data as input. Must use -zscore_gct""")
     #from corr
-    parser.add_argument("--infile", help="Input txt file (filtered and log transformed data).")
-    parser.add_argument("-zscore_gct", help="Zscore input gct file (use instead of --infile)")
-    parser.add_argument("-out_directory",required=True, help="Path to directory for eVIP output files")
+    parser.add_argument("--infile",
+                        help="Input txt file (filtered and log transformed data).")
+    parser.add_argument("-zscore_gct",
+                        help="Zscore input gct file (use instead of --infile)")
+    parser.add_argument("-out_directory",required=True,
+                        help="Path to directory for eVIP output files")
     #from compare
-    parser.add_argument("-sig_info",required=True, help = "sig info file with gene information and distil information")
-    parser.add_argument("-c",required=True, help = ".grp file containing allele names of control perturbations. If this file is given, a null will be calculated from these")
-    parser.add_argument("-r", required=True, help = "File explicitly indicating which comparisons to do. Assumes the file has a header and it is ignored. The first column is the reference allele and second column is test allele. If this file is not given, then the reference alleles are assumed to be WT and inferred from the allele names.")
-    parser.add_argument("-num_reps",required=True, help = "Number of replicates expected for each allele. DEF=3")
-    parser.add_argument("-ie_filter", help = "Threshold for infection efficiency. Any wildtype or mutant alleles having an ie below this threshold, will be removed")
-    parser.add_argument("-ie_col", help = "Name of the column in the sig_info file with infection efficiency information. DEF=x_ie_a549")
+    parser.add_argument("-sig_info",required=True,
+                        help = "sig info file with gene information and distil information")
+    parser.add_argument("-c",required=True,
+                        help = """.grp file containing allele names of control perturbations.
+                        If this file is given, a null will be calculated from these""")
+    parser.add_argument("-r", required=True,
+                        help = """File explicitly indicating which comparisons
+                        to do. Assumes the file has a header. The first column
+                        is the reference allele and second column is test allele.""")
+
+    parser.add_argument("-num_reps",required=True,
+                        help = "Number of replicates expected for each allele. DEF=3")
+    parser.add_argument("-ie_filter",
+                        help = """L1000 threshold for infection efficiency. Any wildtype
+                        or mutant alleles having an ie below this threshold,
+                        will be removed""")
+
+    parser.add_argument("-ie_col",
+                        help = "Name of the column in the sig_info file with infection efficiency information. DEF=x_ie_a549")
     parser.add_argument("-i", help = "Number of iterations to run. DEF=1000")
-    parser.add_argument("-allele_col", help = "Column name in sig_info file that indicates the allele names.DEF=x_mutation_status")
-    parser.add_argument("-conn_null", help = " Optional file containing connectivity null values from a previous run. Should end in _conn_null.txt")
+    parser.add_argument("-allele_col",
+                        help = "Column name in sig_info file that indicates the allele names.DEF=x_mutation_status")
+    parser.add_argument("-conn_null",
+                        help = " Optional file containing connectivity null values from a previous run. Should end in _conn_null.txt")
     #from predict
     parser.add_argument("-conn_thresh",help = "P-value threshold for connectivity vs null. DEFAULT=0.05")
     parser.add_argument("-mut_wt_rep_thresh", help = "P-value threshold for comparison of WT and mut robustness. DEFAULT=0.05")
@@ -64,12 +86,10 @@ def main(infile=None, zscore_gct = None, out_directory=None, sig_info =None, c=N
     parser.add_argument("-viz_ymin", help = "Viz: Minimum y-value of rep value. DEF=-100")
     parser.add_argument("-viz_ymax", help = "Viz: Maximum y-value of rep value. DEF=100")
     parser.add_argument("-corr_val", help = "Viz: String used to label the correlation value. DEF= 'row median rankpoints' ")
-    #eVIPP
-    parser.add_argument("-eVIPP", action ="store_true", help="Use this option when doing pathway analysis, must also have JSON file ")
-    parser.add_argument("-JSON", help= "JSON file created by create_pathway_JSON.py. Contains dictionary of pathways and the associated ids")
-    parser.add_argument("-min_genes", help = "Minimum amount of pathway genes found in data to run eVIPP on. DEF = 5")
-    parser.add_argument("-viz_off", action ="store_true", help = "Will not perform eVIP viz step")
+
     parser.add_argument("-sparkler_off", action ="store_true",help = "Will not perform eVIP sparkler step")
+    parser.add_argument("-viz_off", action ="store_true", help = "Will not perform eVIP viz step")
+
 
     global args
     args = parser.parse_args()
@@ -80,42 +100,9 @@ def main(infile=None, zscore_gct = None, out_directory=None, sig_info =None, c=N
     if not os.path.exists(out_dir):
         os.makedirs(out_dir)
 
-    # running eVIP using JSON (running eVIP using only genes from JSON pathways)
-    if args.JSON:
-        print "JSON"
-        print "Extracting pathway genes from data..."
 
-        #making output for eVIP on the JSON genes
-        eVIP_JSON_dir = out_dir + "/eVIP_out_JSON/"
-        if not os.path.exists(eVIP_JSON_dir):
-            os.makedirs(eVIP_JSON_dir)
+    if args.l1000:
 
-        JSON_extracted_loc = out_dir + "/eVIP_out_JSON/JSON_extracted_data.gct"
-
-        #extracting the JSON genes from the data
-        JSON_extraction()
-
-        print "running eVIP on pathway genes..."
-
-        #if input is expression data (infile option)
-        if args.infile:
-            run_eVIP(JSON_extracted_loc, args.zscore_gct, out_dir + "/eVIP_out_JSON/" , args.sig_info, args.c, args.r, args.num_reps,
-                 args.ie_filter, args.ie_col, args.i, args.allele_col, args.conn_null, args.conn_thresh,
-                 args.mut_wt_rep_rank_diff, args.use_c_pval, args.cell_id, args.plate_id, args.ref_allele_mode,
-                 args.x_thresh, args.y_thresh, args.annotate, args.by_gene_color, args.pdf, args.xmin,
-                 args.xmax, args.ymin, args.ymax, args.viz_ymin, args.viz_ymax, args.corr_val)
-
-        #if input is z scores (zscore_gct option)
-        if args.zscore_gct:
-            run_eVIP(args.infile, JSON_extracted_loc, out_dir + "/eVIP_out_JSON/" , args.sig_info, args.c, args.r, args.num_reps,
-                 args.ie_filter, args.ie_col, args.i, args.allele_col, args.conn_null, args.conn_thresh,
-                 args.mut_wt_rep_rank_diff, args.use_c_pval, args.cell_id, args.plate_id, args.ref_allele_mode,
-                 args.x_thresh, args.y_thresh, args.annotate, args.by_gene_color, args.pdf, args.xmin,
-                 args.xmax, args.ymin, args.ymax, args.viz_ymin, args.viz_ymax, args.corr_val)
-
-
-    #running using just the input file (original way to run)
-    else:
         eVIP_dir = out_dir + "/eVIP_out"
         if not os.path.exists(eVIP_dir):
             os.makedirs(eVIP_dir)
@@ -126,27 +113,8 @@ def main(infile=None, zscore_gct = None, out_directory=None, sig_info =None, c=N
                  args.x_thresh, args.y_thresh, args.annotate, args.by_gene_color, args.pdf, args.xmin,
                  args.xmax, args.ymin, args.ymax, args.viz_ymin, args.viz_ymax, args.corr_val)
 
-    #if using JSON to test pathways
-    if args.JSON and args.eVIPP:
-        print "Running eVIPP using JSON..."
-        summary_file = open(out_dir + "/eVIPP_summary.txt", "w")
-        summary_eVIPP_vals = open(out_dir + "/eVIPP_combined_predict_files.txt", "w")
 
-        #getting used pathways (removing pathways in JSON that there isn't data for)
-        pway_dict, used_pathways = JSON_pway()
 
-        #running eVIP for each pathway
-        JSON_eVIP(used_pathways)
-
-        summarize(used_pathways, summary_file)
-        summarize_predict_files(used_pathways, summary_eVIPP_vals)
-
-        #eVIPP sparkler
-
-        print "Making allele pathway sparkler plots..."
-        run_eVIPP_sparkler = eVIPP_sparkler.main(pred_file= out_dir + "/eVIPP_combined_predict_files.txt", ref_allele_mode=args.ref_allele_mode, y_thresh=args.y_thresh, x_thresh=args.x_thresh, use_c_pval=args.use_c_pval,
-                 annotate=args.annotate, by_gene_color=args.by_gene_color, pdf=args.pdf, xmin=args.xmin, xmax=args.xmax, ymin=args.ymin, ymax=args.ymax,
-                 out_dir= out_dir + "/eVIPP_sparkler_plots")
 
 
 ############
