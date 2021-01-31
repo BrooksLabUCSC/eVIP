@@ -20,6 +20,8 @@ eVIP2: Expression-based variant impact phenotyping to predict the function of ge
 Alexis M. Thornton, Lishan Fang, Casey O’Brien, Alice H. Berger, Marios Giannakis, Angela N. Brooks
 bioRxiv 872028; doi: https://doi.org/10.1101/872028
 
+[Repo for eVIP2 paper analysis](https://github.com/althornt/eVIP2-paper)
+
 
 ### Requirements
 There are many requirements for running eVIP2. Users can run eVIP2 within the conda environment provided in **/misc/evip2_env.yaml**. Refer to the conda docs for how to [create an environment from an environment.yml file](https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#creating-an-environment-from-an-environment-yml-file).
