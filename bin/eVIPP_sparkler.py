@@ -231,7 +231,7 @@ def main(pred_file=None, ref_allele_mode=None, y_thresh=None, x_thresh=None, use
                     c=main_markers["col"],
                     marker=MAIN_MARKER,
                     edgecolors="none",
-                    linewidth=0)
+                    linewidth=0, alpha=0.5)
 
         plt.scatter(neg_markers["x"],
                     neg_markers["y"],
@@ -251,7 +251,7 @@ def main(pred_file=None, ref_allele_mode=None, y_thresh=None, x_thresh=None, use
             ax.set_xlabel("-log10(p-val)")
         ax.set_ylabel("impact direction score")
 
-        this_fig.savefig("%s/all_spark_plots.%s" % (out_dir, format), format=format)
+        this_fig.savefig("%s/all_spark_plots.%s" % (out_dir, format), format=format, dpi=400)
 
         plt.close(this_fig)
 

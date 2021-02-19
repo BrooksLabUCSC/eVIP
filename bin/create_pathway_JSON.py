@@ -1,4 +1,4 @@
-import mygene
+# import mygene
 import argparse
 import json
 
