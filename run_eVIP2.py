@@ -75,8 +75,8 @@ def main(infile=None, zscore_gct = None, out_directory=None, sig_info =None, c=N
 
     #from sparkler
     parser.add_argument("-ref_allele_mode", action ="store_true", help = "Sparkler+Viz: Instead of organizing plots by gene, will use the wt column to determine what are the reference alleles." )
-    parser.add_argument("-x_thresh" , help = "Sparkler: Threshold of significance")
-    parser.add_argument("-y_thresh", help = "Sparkler: Threshold of impact direction")
+    parser.add_argument("-x_thresh" , help = "Sparkler: Threshold of significance",default=1.3,type=float)
+    parser.add_argument("-y_thresh", help = "Sparkler: Threshold of impact direction",default=1.3,type=float)
     parser.add_argument("-annotate", action ="store_true", help = "Sparkler: Will add allele labels to points.")
     parser.add_argument("-by_gene_color", help = "Sparkler: File containing labels and colors for gene-centric plot.")
     parser.add_argument("-pdf", help = "Sparkler + Viz: Will print plots in pdf format instead of png.")
@@ -99,7 +99,7 @@ def main(infile=None, zscore_gct = None, out_directory=None, sig_info =None, c=N
     #run_eVIP2
     parser.add_argument("-input_dir", help="Path to directory of kallisto outputs")
     parser.add_argument("-input_gene_tpm", help="Gene tpm table input for eVIP overall prediction")
-    parser.add_argument("-gtf", required=True, help="Gtf file used to convert transcript counts to gene counts")
+    parser.add_argument("-gtf", help="Gtf file used to convert transcript counts to gene counts")
     parser.add_argument("-control", required=False, help="If multiple controls in the controls file, designate which to use for deseq2")
     parser.add_argument("-tx2gene", action ="store_true",required=False, help="Use tximport for transcript to gene conversion when using -input_dir")
 

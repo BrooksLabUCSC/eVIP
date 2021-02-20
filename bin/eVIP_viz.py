@@ -176,12 +176,15 @@ def main():
     opt_parser.check_required("--null_conn")
     opt_parser.check_required("--out_dir")
 
-    eVIP_run_main(pred_file=args.pred_file, sig_info =args.sig_info, gctx=args.gctx,
-            sig_gctx = args.sig_gctx, ref_allele_mode = args.ref_allele_mode,
-            null_conn = args.null_conn, out_dir = args.out_dir,ymin = args.ymin,
-            ymax= args.ymax, allele_col = args.allele_col,use_c_pval = args.use_c_pval,
-            pdf = args.pdf, cell_id = args.cell_id, plate_id =  args.plate_id,
-            corr_val_str = args.corr_val_str)
+    eVIP_run_main(pred_file=options.pred_file, sig_info =options.sig_info,
+                    gctx=options.gctx,sig_gctx = options.sig_gctx,
+                    ref_allele_mode = options.ref_allele_mode,
+                    null_conn = options.null_conn, out_dir = options.out_dir,
+                    ymin = options.ymin,ymax= options.ymax,
+                    allele_col = options.allele_col,
+                    use_c_pval = options.use_c_pval,pdf = options.pdf,
+                    cell_id = options.cell_id, plate_id =  options.plate_id,
+                    corr_val_str = options.corr_val_str)
 
 
 def eVIP_run_main(pred_file=None, sig_info =None, gctx=None,

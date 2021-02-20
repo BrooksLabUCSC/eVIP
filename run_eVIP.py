@@ -94,9 +94,12 @@ def main(infile=None, zscore_gct = None, out_directory=None, sig_info =None,
                         gene, will use the wt column to determine what are the
                         reference alleles.""" )
     parser.add_argument("-x_thresh" ,
-                        help = "Sparkler: Threshold of significance")
+                        help = "Sparkler: Threshold of significance",
+                        default=1.3,type=float
+                        )
     parser.add_argument("-y_thresh",
-                        help = "Sparkler: Threshold of impact direction")
+                        help = "Sparkler: Threshold of impact direction",
+                        default=1.3, type=float)
     parser.add_argument("-annotate", action ="store_true",
                         help = "Sparkler: Will add allele labels to points.")
     parser.add_argument("-by_gene_color",

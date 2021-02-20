@@ -31,7 +31,7 @@ import matplotlib.pyplot as plt
 #############
 # CONSTANTS #
 #############
-# NUM_ITERATIONS = 1000
+NUM_ITERATIONS = 1000
 NUM_REPS = 3
 
 #LOG10_ZERO = 10.0
@@ -173,12 +173,15 @@ def main():
     opt_parser.check_required("-c")
     opt_parser.check_required("-o")
 
-    run_main(sig_info=args.sig_info, gctx = args.gctx,
-                allele_col = args.allele_col, o = args.o, r = args.r,
-                 c = args.c, i = args.i, conn_null = args.conn_null,
-                 ie_col = args.ie_col,  ie_filter = args.ie_filter,
-                 num_reps = args.num_reps, cell_id = args.cell_id,
-                 plate_id = args.plate_id)
+
+
+    run_main(sig_info=options.sig_info, gctx = options.gctx,
+                allele_col = options.allele_col, o = options.output_file_prefix,
+                r = options.reference_test_file, c = options.controls_file,
+                i = options.num_iterations, conn_null = options.conn_null_input,
+                ie_col = options.ie_col,  ie_filter = options.ie_filter,
+                num_reps = options.num_reps, cell_id = options.cell_id,
+                plate_id = options.plate_id)
 
 
 def run_main(sig_info=None, gctx = None, allele_col = None, o = None, r = None,

@@ -17,14 +17,6 @@ import os
 import pdb
 import csv
 
-#############
-# CONSTANTS #
-#############
-DIFF_WT_MT_RANK = 5.0
-#################
-# END CONSTANTS #
-#################
-
 
 ###########
 # CLASSES #
@@ -86,8 +78,8 @@ def main():
                           type="float",
                           help="""The minimum difference in median rankpoint
                                   between WT and mut to consider a difference.
-                                  DEF=%d""" % DIFF_WT_MT_RANK,
-                          default=DIFF_WT_MT_RANK)
+                                  DEF=5""" ,
+                          default=5)
     opt_parser.add_option("--disting_thresh",
                           dest="disting_thresh",
                           type="float",
@@ -101,6 +93,16 @@ def main():
                           help="Will use corrected p-value instead of raw p-val",
                           default=False)
 
+    opt_parser.add_option("--cond_median_max_diff_thresh",
+                          dest="cond_median_max_diff_thresh",
+                          action="store_true",
+                          help=""""Threshold for maximum difference between
+                          condition correlation medians when determining if
+                           variant is not neutral. Default = 0.2""",
+                          default=0.2)
+
+
+
     (options, args) = opt_parser.parse_args()
 
     # validate the command line arguments
@@ -109,12 +111,13 @@ def main():
     opt_parser.check_required("--mut_wt_rep_thresh")
     opt_parser.check_required("--disting_thresh")
 
-    run_main(i=args.i, o= args.o, conn_thresh=args.conn_thresh,
-            mut_wt_rep_thresh=args.mut_wt_rep_thresh,
-             mut_wt_rep_rank_diff=args.mut_wt_rep_rank_diff,
-             disting_thresh=args.disting_thresh,
-            use_c_pval=args.use_c_pval,
-            cond_median_max_diff_thresh=args.cond_median_max_diff_thresh)
+    run_main(i=options.input_table, o= options.output_table,
+            conn_thresh=options.conn_thresh,
+            mut_wt_rep_thresh=options.mut_wt_thresh,
+            mut_wt_rep_rank_diff=options.mut_wt_rep_diff,
+            disting_thresh=options.disting_thresh,
+            use_c_pval=options.use_c_pval,
+            cond_median_max_diff_thresh=options.cond_median_max_diff_thresh)
 
 
 def run_main(i=None, o= None, conn_thresh=None, mut_wt_rep_thresh=None,

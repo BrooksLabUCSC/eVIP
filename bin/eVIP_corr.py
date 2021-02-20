@@ -21,7 +21,7 @@ def main():
     parser.add_argument("-out_dir", help = "Directory for output files")
 
     args = parser.parse_args()
-    run_main(input=arg.input, zscore_gct=args.zscore_gct, out_dir=args.out_dir)
+    run_main(input=args.input, zscore_gct=args.zscore_gct, out_dir=args.out_dir)
 
 def run_main(input=None, zscore_gct=None, out_dir=None):
 
