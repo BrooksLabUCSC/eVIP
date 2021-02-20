@@ -1,3 +1,5 @@
+# Author: Alexis M. Thornton
+
 # import mygene
 import argparse
 import json

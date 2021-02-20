@@ -69,11 +69,7 @@ def main():
                           help="""Output table with mutation impact predictions
                                   based on different methods""",
                           default=None)
-#   opt_parser.add_option("--robustness_thresh",
-#                         dest="robust_thresh",
-#                         type="float",
-#                         help="P-value threshould for robustness",
-#                         default=None)
+
     opt_parser.add_option("--conn_thresh",
                           dest="conn_thresh",
                           type="float",
@@ -98,21 +94,7 @@ def main():
                           help="""P-value threshould that tests if mut and wt reps
                                   are indistinguishable from each other""",
                           default=None)
-#   opt_parser.add_option("--robustness_rank",
-#                         dest="robust_rank",
-#                         type="float",
-#                         help="Rankpoint threshold for robustness.",
-#                         default=None)
-#   opt_parser.add_option("--conn_rank",
-#                         dest="conn_rank",
-#                         type="float",
-#                         help="Rankpoint threshold for connectivity.",
-#                         default=None)
-#     opt_parser.add_option("--conn_null_med",
-#                           dest="conn_null_med",
-#                           type="float",
-#                           help="Median of null connectivity distribution.",
-#                           default=None)
+
     opt_parser.add_option("--use_c_pval",
                           dest="use_c_pval",
                           action="store_true",
@@ -124,92 +106,15 @@ def main():
     # validate the command line arguments
     opt_parser.check_required("-i")
     opt_parser.check_required("-o")
-#   opt_parser.check_required("--robustness_thresh")
-#   opt_parser.check_required("--conn_thresh")
     opt_parser.check_required("--mut_wt_rep_thresh")
     opt_parser.check_required("--disting_thresh")
-#    opt_parser.check_required("--robustness_rank")
-#    opt_parser.check_required("--conn_rank")
-#     opt_parser.check_required("--conn_null_med")
 
-    input_table = open(options.input_table)
-    output = open(options.output_table, "w")
-
-#   r_thresh = options.robust_thresh
-    c_thresh = options.conn_thresh
-    mut_wt_thresh = options.mut_wt_thresh
-    disting_thresh = options.disting_thresh
-
-    mut_wt_rep_diff = options.mut_wt_rep_diff
-
-    use_c_pval = options.use_c_pval
-
-#   r_rank = options.robust_rank
-#   c_rank = options.conn_rank
-
-    # conn_null_med = options.conn_null_med
-
-    file_reader = csv.DictReader(input_table, delimiter="\t")
-
-
-    column_headers = ["gene",
-                      "mut",
-                      "mut_rep",
-                      "wt_rep",
-                      "mut_wt_connectivity",
-                      "wt",
-                      "cell_line",
-                      "mut_wt_rep_pval",
-                      "mut_wt_conn_null_pval",
-                      "wt_mut_rep_vs_wt_mut_conn_pval",
-                      "kruskal_diff",
-                      "mut_wt_rep_c_pval",
-                      "mut_wt_conn_null_c_pval",
-                      "wt_mut_rep_vs_wt_mut_conn_c_pval",
-                      "prediction"]
-
-
-    file_writer = csv.DictWriter(output, delimiter="\t",
-                                 fieldnames=column_headers)
-    file_writer.writeheader()
-
-    for row in file_reader:
-        if use_c_pval:
-            prediction = get_prediction_6(float(row["wt_rep"]),
-                                                 float(row["mut_rep"]),
-                                                 float(row["mut_wt_rep_c_pval"]),
-                                                 float(row["mut_wt_connectivity"]),
-                                                 float(row["mut_wt_conn_null_c_pval"]),
-                                                 float(row["wt_mut_rep_vs_wt_mut_conn_c_pval"]),
-                                                 mut_wt_thresh,
-                                                 mut_wt_rep_diff,
-                                                 c_thresh,
-                                                 disting_thresh,
-                                                 float(row["kruskal_diff"]))
-            row["prediction"]= prediction
-
-        else:
-            prediction = get_prediction_6(float(row["wt_rep"]),
-                                                 float(row["mut_rep"]),
-                                                 float(row["mut_wt_rep_pval"]),
-                                                 float(row["mut_wt_connectivity"]),
-                                                 float(row["mut_wt_conn_null_pval"]),
-                                                 float(row["wt_mut_rep_vs_wt_mut_conn_pval"]),
-                                                 mut_wt_thresh,
-                                                 mut_wt_rep_diff,
-                                                 c_thresh,
-                                                 disting_thresh,
-                                                 float(row["kruskal_diff"]))
-
-            row["prediction"]= prediction
-
-        file_writer.writerow(row)
-
-    input_table.close()
-    output.close()
-
-
-    sys.exit(0)
+    run_main(i=args.i, o= args.o, conn_thresh=args.conn_thresh,
+            mut_wt_rep_thresh=args.mut_wt_rep_thresh,
+             mut_wt_rep_rank_diff=args.mut_wt_rep_rank_diff,
+             disting_thresh=args.disting_thresh,
+            use_c_pval=args.use_c_pval,
+            cond_median_max_diff_thresh=args.cond_median_max_diff_thresh)
 
 
 def run_main(i=None, o= None, conn_thresh=None, mut_wt_rep_thresh=None,
@@ -256,32 +161,32 @@ def run_main(i=None, o= None, conn_thresh=None, mut_wt_rep_thresh=None,
     for row in file_reader:
         if use_c_pval:
             prediction = get_prediction_6(float(row["wt_rep"]),
-                                                 float(row["mut_rep"]),
-                                                 float(row["mut_wt_rep_c_pval"]),
-                                                 float(row["mut_wt_connectivity"]),
-                                                 float(row["mut_wt_conn_null_c_pval"]),
-                                                 float(row["wt_mut_rep_vs_wt_mut_conn_c_pval"]),
-                                                 mut_wt_thresh,
-                                                 mut_wt_rep_diff,
-                                                 c_thresh,
-                                                 disting_thresh,
-                                                 cond_median_max_diff_thresh,
-                                                 float(row["kruskal_diff"]))
+                                         float(row["mut_rep"]),
+                                         float(row["mut_wt_rep_c_pval"]),
+                                         float(row["mut_wt_connectivity"]),
+                                         float(row["mut_wt_conn_null_c_pval"]),
+                                         float(row["wt_mut_rep_vs_wt_mut_conn_c_pval"]),
+                                         mut_wt_thresh,
+                                         mut_wt_rep_diff,
+                                         c_thresh,
+                                         disting_thresh,
+                                         cond_median_max_diff_thresh,
+                                         float(row["kruskal_diff"]))
             row["prediction"]= prediction
 
         else:
             prediction = get_prediction_6(float(row["wt_rep"]),
-                                                 float(row["mut_rep"]),
-                                                 float(row["mut_wt_rep_pval"]),
-                                                 float(row["mut_wt_connectivity"]),
-                                                 float(row["mut_wt_conn_null_pval"]),
-                                                 float(row["wt_mut_rep_vs_wt_mut_conn_pval"]),
-                                                 mut_wt_thresh,
-                                                 mut_wt_rep_diff,
-                                                 c_thresh,
-                                                 disting_thresh,
-                                                 cond_median_max_diff_thresh,
-                                                 float(row["kruskal_diff"]))
+                                         float(row["mut_rep"]),
+                                         float(row["mut_wt_rep_pval"]),
+                                         float(row["mut_wt_connectivity"]),
+                                         float(row["mut_wt_conn_null_pval"]),
+                                         float(row["wt_mut_rep_vs_wt_mut_conn_pval"]),
+                                         mut_wt_thresh,
+                                         mut_wt_rep_diff,
+                                         c_thresh,
+                                         disting_thresh,
+                                         cond_median_max_diff_thresh,
+                                         float(row["kruskal_diff"]))
 
             row["prediction"]= prediction
 
@@ -313,7 +218,8 @@ def formatLine(line):
 
 def get_prediction_6(wt_rep, mut_rep, mut_wt_rep_pval,
                      mut_wt_conn, mut_wt_conn_pval, disting_pval,
-                     mut_wt_thresh, mut_wt_rep_diff, c_thresh, disting_thresh, cond_median_max_diff_thresh,cond_median_max_diff):
+                     mut_wt_thresh, mut_wt_rep_diff, c_thresh, disting_thresh,
+                     cond_median_max_diff_thresh,cond_median_max_diff):
 
     if disting_pval < disting_thresh:
         if max_diff(wt_rep, mut_rep, mut_wt_conn) < mut_wt_rep_diff:

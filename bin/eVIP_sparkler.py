@@ -32,9 +32,6 @@ from eVIP_compare import getSelfConnectivity, getConnectivity
 #############
 # CONSTANTS #
 #############
-DIFF_THRESH = 5
-INFINITY = 10
-DEF_PRED_COL = "prediction"
 
 #RGB CODES
 #GOF_COL = "#e31a1c"
@@ -51,11 +48,10 @@ NI_COL = colorConverter.to_rgba("#ffffff", 1)
 MAIN_MARKER = 'o'
 NEG_MARKER = 'o'
 
-
-XMIN=0
-XMAX=4
-YMIN=-3
-YMAX=3
+# XMIN=0
+# XMAX=4
+# YMIN=-3
+# YMAX=3
 
 MARKER_SIZE= 300
 SPARKLER_LINEWIDTH = 3
@@ -91,9 +87,10 @@ class OptionParser(optparse.OptionParser):
 ###############
 
 
-def eVIP_run_main(pred_file=None, ref_allele_mode=None, y_thresh=None, x_thresh=None, use_c_pval=None,
-                  annotate=None, by_gene_color=None, pdf=None, xmin=None, xmax=None, ymin=None, ymax=None,
-                  out_dir=None):
+def eVIP_run_main(pred_file=None, ref_allele_mode=None, y_thresh=None,
+                    x_thresh=None, use_c_pval=None, annotate=None,
+                     by_gene_color=None, pdf=None, xmin=None, xmax=None,
+                     ymin=None, ymax=None, out_dir=None):
     x_thresh = float(x_thresh)
     y_thresh = float(y_thresh)
 
@@ -119,7 +116,7 @@ def eVIP_run_main(pred_file=None, ref_allele_mode=None, y_thresh=None, x_thresh=
     x_thresh = getNegLog10(x_thresh, xmax)
     y_thresh = getNegLog10(y_thresh, ymax)
     annotate = annotate
-    pred_col = DEF_PRED_COL
+    pred_col = "prediction"
     ref_allele_mode = ref_allele_mode
 
     gene2type = None
@@ -134,17 +131,10 @@ def eVIP_run_main(pred_file=None, ref_allele_mode=None, y_thresh=None, x_thresh=
      gene2col,
      gene_type2pred2count,
      gene2markerstyle) = parse_pred_file(pred_file, x_thresh, y_thresh,
-                                         pred_col, use_c_pval, gene2type, ref_allele_mode, xmax, ymax)
-
-
+                                        pred_col, use_c_pval, gene2type,
+                                        ref_allele_mode, xmax, ymax)
 
     if gene2type:
-        # Print out gene type and prediction counts
-        # for gene_type in gene_type2pred2count:
-        #     print "###%s###" % gene_type
-        #     for pred in gene_type2pred2count[gene_type]:
-        #         print "%s\t%s" % (pred, gene_type2pred2count[gene_type][pred])
-
         gene_type2data = {"ONC": {"mut_wt": [],
                                   "mut_wt_rep_p": [],
                                   "neg_log_p": [],
@@ -179,40 +169,12 @@ def eVIP_run_main(pred_file=None, ref_allele_mode=None, y_thresh=None, x_thresh=
         this_fig = plt.figure()
         ax = this_fig.add_subplot(111)
 
-        #        plt.axhline(y=0, color="grey")
-
         all_mut_wt.extend(gene2mut_wt[gene])
         all_mut_wt_rep_p.extend(gene2mut_wt_rep_p[gene])
         all_neg_log_p.extend(gene2neg_log_p[gene])
         all_col.extend(gene2col[gene])
         all_diff_score.extend(gene2diff_score[gene])
         all_markerstyle.extend(gene2markerstyle[gene])
-
-
-        """
-        if gene not in gene2type:
-            gene2type[gene] = "UNKN"
-
-        # Add to gene-type specific plot data
-        for gene_type in gene_type2data:
-            gene_type2data[gene_type]["mut_wt"].extend(gene2mut_wt[gene])
-            gene_type2data[gene_type]["mut_wt_rep_p"].extend(gene2mut_wt_rep_p[gene])
-            gene_type2data[gene_type]["neg_log_p"].extend(gene2neg_log_p[gene])
-            gene_type2data[gene_type]["markerstyle"].extend(gene2markerstyle[gene])
-
-            gene_root = gene.split("_")[0]
-            if gene_type == "TSG_noTP53":
-                if gene2type[gene_root] == "TSG" and gene != "TP53":
-                    gene_type2data[gene_type]["col"].extend(gene2col[gene])
-                else:
-                    gene_type2data[gene_type]["col"].extend(makeGrey(gene2col[gene]))
-            else:
-                if gene2type[gene_root] == gene_type:
-                    gene_type2data[gene_type]["col"].extend(gene2col[gene])
-                else:
-                    gene_type2data[gene_type]["col"].extend(makeGrey(gene2col[gene]))
-        """
-
 
         (main_markers,
          neg_markers) = split_data(gene2markerstyle[gene],
@@ -280,76 +242,6 @@ def eVIP_run_main(pred_file=None, ref_allele_mode=None, y_thresh=None, x_thresh=
                          format=format)
 
         plt.close(this_fig)
-
-    """
-    # GENE-TYPE plots
-    for legend_flag in ["legend_on", "legend_off"]:
-        for gene_type in gene_type2data:
-            this_fig = plt.figure()
-            ax = this_fig.add_subplot(111)
-
-            #            plt.axhline(y=0, color="grey")
-
-            # Add lines
-            for i in range(len(gene_type2data[gene_type]["mut_wt"])):
-                this_col = gene_type2data[gene_type]["col"][i]
-                if this_col == colorConverter.to_rgba("#ffffff", 1):  # white
-                    this_col = INERT_COL
-                plt.plot([0, gene_type2data[gene_type]["neg_log_p"][i]],
-                         [0, gene_type2data[gene_type]["mut_wt_rep_p"][i]],
-                         #                         [0, gene_type2data[gene_type]["mut_wt"][i]],
-                         color=this_col,
-                         #                         alpha=0.5,
-                         linewidth=SPARKLER_LINEWIDTH)
-
-            (main_markers,
-             neg_markers) = split_data(gene_type2data[gene_type]["markerstyle"],
-                                       gene_type2data[gene_type]["neg_log_p"],
-                                       gene_type2data[gene_type]["mut_wt_rep_p"],
-                                       gene_type2data[gene_type]["col"])
-
-            plt.scatter(main_markers["x"],
-                        main_markers["y"],
-                        s=MARKER_SIZE,
-                        c=main_markers["col"],
-                        marker=MAIN_MARKER,
-                        edgecolors="none",
-                        linewidth=0)
-
-            plt.scatter(neg_markers["x"],
-                        neg_markers["y"],
-                        s=MARKER_SIZE,
-                        c=neg_markers["col"],
-                        marker=NEG_MARKER,
-                        linewidth=4)
-
-            plt.axvline(x=x_thresh, color="grey", ls=THRESH_LS)
-
-            plt.xlim(xmin, xmax)
-            plt.ylim(ymin, ymax)
-
-            if use_c_pval:
-                ax.set_xlabel("-log10(corrected p-val)")
-            else:
-                ax.set_xlabel("-log10(p-val)")
-            ax.set_ylabel("impact direction score")
-
-            ax.text(100, -7, "MUT robustness < WT robustness", fontsize="small",
-                    ha="center")
-            ax.text(100, 7, "MUT robustness > WT robustness", fontsize="small",
-                    ha="center")
-
-            if legend_flag == "legend_on":
-                plt.legend(recs, predictions, loc="lower right", fontsize='xx-small',
-                           title="prediction")
-
-            this_fig.savefig("%s/%s_spark_plots_%s.%s" % (out_dir,
-                                                          gene_type,
-                                                          legend_flag,
-                                                          format), format=format)
-
-            plt.close(this_fig)
-    """
 
     # final plot
     this_fig = plt.figure()
@@ -450,7 +342,8 @@ def parseGeneColor(by_gene_color_file_name):
 
     return gene2label
 
-def parse_pred_file(pred_file, x_thresh, y_thresh, pred_col, use_c_pval, gene2type, ref_allele_mode, xmax, ymax):
+def parse_pred_file(pred_file, x_thresh, y_thresh, pred_col, use_c_pval,
+                    gene2type, ref_allele_mode, xmax, ymax):
     """
     (gene2mut_wt,
      gene2mut_wt_rep_p,
@@ -578,7 +471,8 @@ def parse_pred_file(pred_file, x_thresh, y_thresh, pred_col, use_c_pval, gene2ty
 
 
 
-    return gene2mut_wt, gene2mut_wt_rep_p, gene2neg_log_p, gene2diff_score, gene2allele, gene2col, gene_type2pred2count, gene2markerstyle
+    return gene2mut_wt, gene2mut_wt_rep_p, gene2neg_log_p, gene2diff_score, \
+                gene2allele, gene2col, gene_type2pred2count, gene2markerstyle
 
 def split_data(marker_list, x_list, y_list, col_list):
     """

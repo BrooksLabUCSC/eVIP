@@ -1,3 +1,5 @@
+# Author: Alexis Thornton
+
 #!/usr/bin/python
 import argparse
 import os

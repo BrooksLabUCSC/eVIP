@@ -1,3 +1,5 @@
+# Author: Alexis M. Thornton
+
 #!/usr/bin/python
 
 import sys

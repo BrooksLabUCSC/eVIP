@@ -1,10 +1,10 @@
-########################################################################
-# author: Alexis M. Thornton
-#
-# create a upset plot to see how much gene overlap there is between the
-# different pathways from the pathway predictions
-#
-########################################################################
+# Author: Alexis M. Thornton
+
+"""
+create a upset plot to see how much gene overlap there is between the
+different pathways from the pathway predictions
+"""
+
 import pandas as pd
 import json
 import upsetplot

@@ -30,23 +30,14 @@ from eVIP_compare import getSelfConnectivity, getConnectivity
 # CONSTANTS #
 #############
 PRED_TYPE = ["GOF","LOF","COF", "DOM-NEG", "Neutral","NI"]
-#DEF_PRED_COL = "Scenario_7__decision_tree_COF"
-DEF_PRED_COL = "prediction"
 
 # For jitter plots
 WT_RANGE = [9,11]
 MUT_RANGE = [19,21]
 CONN_RANGE = [29,31]
-#NULL_CONN_RANGE = [36,44]
 
 JITTER_XTICKS = [10, 20, 30]
 XMAX = 40
-
-# DEF_YMIN = -100
-# DEF_YMAX = 100
-
-DEF_YMIN = -1.00
-DEF_YMAX = 1.00
 
 DEF_CORR_VAL_STR = "row median rankpoints"
 DEF_ALLELE_COL = "x_mutation_status"
@@ -95,16 +86,6 @@ def main():
                           help="""File containing the mutation impact
                                   predictions""",
                           default=None)
-#   opt_parser.add_option("--col",
-#                         dest="pred_col",
-#                         type="string",
-#                         help="""Prediciton files have predictions based on
-#                                 multiple scenarios. The scenario needs to be
-#                                 specified because figures will be plotted in
-#                                 the order of GOF, LOF, COF,Inert, NI calls. This
-#                                 specifies the name of the column that contains
-#                                 the prediction. DEF=%s""" % DEF_PRED_COL,
-#                         default=DEF_PRED_COL)
     opt_parser.add_option("--sig_info",
                           dest="sig_info",
                           type="string",
@@ -145,13 +126,11 @@ def main():
     opt_parser.add_option("--ymin",
                           dest="ymin",
                           type="int",
-                          help="Minimum y-value of rep value. DEF=%d" % DEF_YMIN,
-                          default=DEF_YMIN)
+                          help="Minimum y-value of rep value. DEF= -1)
     opt_parser.add_option("--ymax",
                           dest="ymax",
                           type="int",
-                          help="Maximum y-value of rep value. DEF=%d" % DEF_YMAX,
-                          default=DEF_YMAX)
+                          help="Maximum y-value of rep value. DEF= 1)
     opt_parser.add_option("--corr_val_str",
                           dest="corr_val_str",
                           type="string",
@@ -190,215 +169,45 @@ def main():
 
     # validate the command line arguments
     opt_parser.check_required("--pred_file")
-#    opt_parser.check_required("--col")
     opt_parser.check_required("--sig_info")
     opt_parser.check_required("--gctx")
     opt_parser.check_required("--null_conn")
     opt_parser.check_required("--out_dir")
 
-    pred_file = open(options.pred_file)
-    pred_col = DEF_PRED_COL
+    eVIP_run_main(pred_file=args.pred_file, sig_info =args.sig_info, gctx=args.gctx,
+            sig_gctx = args.sig_gctx, ref_allele_mode = args.ref_allele_mode,
+            null_conn = args.null_conn, out_dir = args.out_dir,ymin = args.ymin,
+            ymax= args.ymax, allele_col = args.allele_col,use_c_pval = args.use_c_pval,
+            pdf = args.pdf, cell_id = args.cell_id, plate_id =  args.plate_id,
+            corr_val_str = args.corr_val_str)
 
-    if os.path.exists(options.out_dir):
-        out_dir = os.path.abspath(options.out_dir)
-    else:
-        os.mkdir(options.out_dir)
-        out_dir = os.path.abspath(options.out_dir)
-        # print "Creating output directory: %s" % out_dir
-
-    pdf = options.pdf
-    use_c_pval = options.use_c_pval
-
-    ymin = options.ymin
-    ymax = options.ymax
-
-    allele_col = options.allele_col
-
-    ref_allele_mode = options.ref_allele_mode
-
-    corr_val_str = options.corr_val_str
-
-    cell_id = options.cell_id
-    plate_id = options.plate_id
-
-    sig_info = open(options.sig_info)
-
-    null_conn = getNullConnDist(options.null_conn)
-
-#   null_x_vals = []
-#   for val in null_conn:
-#       null_x_vals.append(random.uniform(NULL_CONN_RANGE[0], NULL_CONN_RANGE[1]))
-
-    this_gctx = gct.parse(options.gctx)
-
-    # this_gctx.read()
-
-
-    sig_gctx = gct.parse(options.sig_gctx)
-    # sig_gctx.read()
-
-    # Process predictions
-    # allele2pvals = {allele:[mut vs wt pval,
-    #                         wt vs mut-wt pval,
-    #                         mut-wt conn pval]
-    (gene2wt,
-     gene2allele_call,
-     gene2num_alleles,
-     allele2pvals) = parse_pred_file(pred_file, pred_col, use_c_pval,
-                                     ref_allele_mode)
-
-
-    allele2distil_ids = parse_sig_info( sig_info, allele_col, cell_id, plate_id)
-
-    for gene in gene2wt:
-
-        this_fig = plt.figure()
-        this_fig.set_size_inches((gene2num_alleles[gene]+1)*4,
-                                  4*3)
-
-        grid_size = (4, gene2num_alleles[gene] + 1)
-
-        wt_heatmap_ax = plt.subplot2grid(grid_size, (0,0))
-        wt_im = plot_rep_heatmap(wt_heatmap_ax,
-                         this_gctx.data_df,
-                         allele2distil_ids[gene2wt[gene]],
-                         allele2distil_ids[gene2wt[gene]],
-                         gene2wt[gene],
-                         ymin, ymax)
-
-        # WT self connectivity
-        wt_self, wt_self_row_medians = getSelfConnectivity(this_gctx,
-                                                           allele2distil_ids[gene2wt[gene]],
-                                                           len(allele2distil_ids[gene2wt[gene]]))
-
-        # Create consistent x values for the wt reps when plotting
-        wt_x_vals = []
-        for val in wt_self_row_medians:
-            wt_x_vals.append(random.randint(WT_RANGE[0], WT_RANGE[1]))
-
-        # Plot color bar on this axis
-        plt.colorbar(wt_im, ax=wt_heatmap_ax, shrink=0.7)
-
-        # Plot allele data
-        col_counter = 1
-
-        for type in PRED_TYPE:
-            for allele in gene2allele_call[gene][type]:
-
-                # CREATE SCATTERPLOT FIGURE
-                plot_signatures(pdf, out_dir,
-                                sig_gctx.data_df,
-                                gene2wt[gene],
-                                allele,
-                                allele2distil_ids[gene2wt[gene]],
-                                allele2distil_ids[allele])
-
-                # PLOT HEATMAP
-                this_hm_ax = plt.subplot2grid(grid_size,
-                                             (0, col_counter))
-                plot_rep_heatmap(this_hm_ax,
-                                 this_gctx.data_df,
-                                 allele2distil_ids[allele],
-                                 allele2distil_ids[allele],
-                                 type + " - " + allele,
-                                 ymin, ymax)
-
-
-                # PLOT WT MUT heatmap
-                this_wt_mut_ax = plt.subplot2grid(grid_size,
-                                                  (1, col_counter))
-
-                plot_rep_heatmap(this_wt_mut_ax,
-                                 this_gctx.data_df,
-                                 allele2distil_ids[gene2wt[gene]],
-                                 allele2distil_ids[allele],
-                                 gene2wt[gene] + " vs " + allele,
-                                 ymin, ymax)
-
-
-                # PLOT RANKPOINT ROWS
-                this_jitter_ax = plt.subplot2grid(grid_size,
-                                                  (2, col_counter))
-
-                mut_self, mt_self_row_medians = getSelfConnectivity(this_gctx,
-                                                                    allele2distil_ids[allele],
-                                                                    len(allele2distil_ids[allele]))
-                wt_mut, wt_mut_row_medians = getConnectivity(this_gctx,
-                                                             allele2distil_ids[gene2wt[gene]],
-                                                             allele2distil_ids[allele],
-                                                             len(allele2distil_ids[allele]))
-
-                plot_jitter(this_jitter_ax,
-                            col_counter,
-                            wt_x_vals,
-                            wt_self_row_medians,
-                            mt_self_row_medians,
-                            wt_mut_row_medians,
-#                            null_x_vals,
-#                            null_conn,
-                            allele2pvals[allele][0],
-                            allele2pvals[allele][1],
-                            use_c_pval,
-                            ymin, ymax,
-                            corr_val_str)
-
-
-                # Compared to random connectivity
-                conn_ax = plt.subplot2grid(grid_size,
-                                           (3, col_counter))
-
-                plot_conn(conn_ax,
-                          col_counter,
-                          null_conn,
-                          wt_mut_row_medians,
-                          allele2pvals[allele][2],
-                          use_c_pval,
-                          corr_val_str)
-
-                col_counter += 1
-
-        if pdf:
-            this_fig.savefig("%s/%s_impact_pred_plots.pdf" % (out_dir, gene),
-                             format="pdf")
-        else:
-            this_fig.savefig("%s/%s_impact_pred_plots.png" % (out_dir, gene))
-        plt.close(this_fig)
-
-    sys.exit(0)
 
 def eVIP_run_main(pred_file=None, sig_info =None, gctx=None,
             sig_gctx = None, ref_allele_mode = None, null_conn = None,
-            out_dir = None,ymin = None, ymax= None, allele_col = None,  use_c_pval = None,
-            pdf = None, cell_id = None, plate_id =  None, corr_val_str = None):
+            out_dir = None,ymin = None, ymax= None, allele_col = None,
+            use_c_pval = None,pdf = None, cell_id = None, plate_id = None,
+            corr_val_str = None):
 
 
     #setting default values
-    # ymin = int(ymin) if ymin != None else int(-100)
-    # ymax = int(ymax) if ymax != None else int(100)
-
     ymin = int(ymin) if ymin != None else int(-1.00)
     ymax = int(ymax) if ymax != None else int(1.00)
 
-
     pred_file = open(pred_file)
-    pred_col = DEF_PRED_COL
+    pred_col = "prediction"
 
     if os.path.exists(out_dir):
         out_dir = os.path.abspath(out_dir)
     else:
         os.mkdir(out_dir)
         out_dir = os.path.abspath(out_dir)
-        # print "Creating output directory: %s" % out_dir
 
     sig_info = open(sig_info)
     null_conn = getNullConnDist(null_conn)
 
     this_gctx = gct.parse(gctx)
-    # this_gctx.read()
 
     sig_gctx = gct.parse(sig_gctx)
-
-    # sig_gctx.read()
 
 
     (gene2wt,
@@ -428,8 +237,8 @@ def eVIP_run_main(pred_file=None, sig_info =None, gctx=None,
 
         # WT self connectivity
         wt_self, wt_self_row_medians = getSelfConnectivity(this_gctx,
-                                                           allele2distil_ids[gene2wt[gene]],
-                                                           len(allele2distil_ids[gene2wt[gene]]))
+                                            allele2distil_ids[gene2wt[gene]],
+                                            len(allele2distil_ids[gene2wt[gene]]))
 
         # Create consistent x values for the wt reps when plotting
         wt_x_vals = []
@@ -486,12 +295,12 @@ def eVIP_run_main(pred_file=None, sig_info =None, gctx=None,
                                                   (2, col_counter))
 
                 mut_self, mt_self_row_medians = getSelfConnectivity(this_gctx,
-                                                                    allele2distil_ids[allele],
-                                                                    len(allele2distil_ids[allele]))
+                                                allele2distil_ids[allele],
+                                                len(allele2distil_ids[allele]))
                 wt_mut, wt_mut_row_medians = getConnectivity(this_gctx,
-                                                             allele2distil_ids[gene2wt[gene]],
-                                                             allele2distil_ids[allele],
-                                                             len(allele2distil_ids[allele]))
+                                             allele2distil_ids[gene2wt[gene]],
+                                             allele2distil_ids[allele],
+                                             len(allele2distil_ids[allele]))
 
                 plot_jitter(this_jitter_ax,
                             col_counter,

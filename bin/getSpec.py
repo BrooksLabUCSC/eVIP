@@ -1,7 +1,5 @@
-########################################################################
-# author: Alexis M. Thornton
-#
-########################################################################
+# Author: Alexis M. Thornton
+
 import pandas as pd
 import numpy as np
 import itertools

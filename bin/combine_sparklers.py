@@ -1,3 +1,5 @@
+# Author: Alexis M. Thornton
+
 import os
 from PIL import Image, ImageDraw, ImageFont
 
@@ -6,7 +8,7 @@ def run(dir,out_image):
     try:
         fnt = ImageFont.truetype('/Library/Fonts/Arial.ttf', 20)
     except:
-        fnt = ImageFont.load_default()	
+        fnt = ImageFont.load_default()
 
     #get mut folders in the eVIPP output directories
     mut_folders = [dI for dI in os.listdir(dir) if os.path.isdir(os.path.join(dir,dI))]

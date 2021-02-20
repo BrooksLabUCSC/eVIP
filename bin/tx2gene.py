@@ -1,3 +1,5 @@
+# Author: Alexis M. Thornton
+
 import os, sys
 import pandas as pd
 import numpy as np

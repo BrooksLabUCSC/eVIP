@@ -37,8 +37,6 @@ NUM_REPS = 3
 #LOG10_ZERO = 10.0
 LOG10_ZERO = 35.0
 
-WT_IDX = 5
-
 DEF_IE_COL = "x_ie_a549"
 DEF_ALLELE_COL = "x_mutation_status"
 
@@ -69,6 +67,118 @@ class OptionParser(optparse.OptionParser):
 ###############
 # END CLASSES #
 ###############
+
+
+########
+# MAIN #
+########
+def main():
+
+    opt_parser = OptionParser()
+
+    # Add Options. Required options should have default=None
+    opt_parser.add_option("--sig_info",
+                          dest="sig_info",
+                          type="string",
+                          help="""sig info file with gene information and distil
+                                  information""",
+                          default=None)
+    opt_parser.add_option("--gctx",
+                          dest="gctx",
+                          type="string",
+                          help="""GCTX file of pairwise similarity. Designed to
+                                  use connectivity score, but any measurement of
+                                  similarity can be used (e.g., pearson
+                                  correlation)""",
+                          default=None)
+    opt_parser.add_option("--allele_col",
+                          dest="allele_col",
+                          type="string",
+                          help="""Column name that indicates the allele names.
+                                  DEF=%s""" % DEF_ALLELE_COL,
+                          default=DEF_ALLELE_COL)
+    opt_parser.add_option("-o",
+                          dest="output_file_prefix",
+                          type="string",
+                          help="""Prefix of output files of mutation impact data.
+                                  Includes figures of p-value distribution.""",
+                          default=None)
+    opt_parser.add_option("-r",
+                          dest="reference_test_file",
+                          type="string",
+                          help="""File explicitly indicating which comparisons
+                                  to do. Assumes the file has a header and it is
+                                  ignored. The first column is the reference
+                                  allele and second column is test allele. If
+                                  this file is not given, then the reference
+                                  alleles are assumed to be WT and inferred from
+                                  the allele names.""",
+                          default=None)
+    opt_parser.add_option("-c",
+                          dest="controls_file",
+                          type="string",
+                          help=""".grp file containing allele names of control
+                                  perturbations. If this file is given, a null
+                                  will be calculated from these""",
+                          default=None)
+    opt_parser.add_option("-i",
+                          dest="num_iterations",
+                          type="int",
+                          help="Number of iterations to run. DEF=%d" % NUM_ITERATIONS,
+                          default=NUM_ITERATIONS)
+    opt_parser.add_option("--conn_null",
+                          dest="conn_null_input",
+                          type="string",
+                          help="""Optional file containing connectvity null
+                          values from a previous run. Should end
+                          in _conn_null.txt""",
+                          default=None)
+    opt_parser.add_option("--ie_col",
+                          dest="ie_col",
+                          type="string",
+                          help="""Name of the column with infection efficiency
+                                  information. DEF=%s""" % DEF_IE_COL,
+                          default=DEF_IE_COL)
+    opt_parser.add_option("--ie_filter",
+                          dest="ie_filter",
+                          type="float",
+                          help="""Threshold for infection efficiency. Any wildtype
+                                  or mutant alleles having an ie below this
+                                  threshold, will be removed""",
+                          default=None)
+    opt_parser.add_option("--num_reps",
+                          dest="num_reps",
+                          type="int",
+                          help="""Number of replicates expected for each allele.
+                                  DEF=%d""" % NUM_REPS,
+                          default=NUM_REPS)
+    opt_parser.add_option("--cell_id",
+                          dest="cell_id",
+                          type="string",
+                          help="""Optional: Will only look at signatures from
+                           this cell line. Helps to filter sig_info file.""",
+                          default=None)
+    opt_parser.add_option("--plate_id",
+                          dest="plate_id",
+                          type="string",
+                          help="""Optional: Will only look at signatures from
+                                  this plate.""",
+                          default=None)
+
+    (options, args) = opt_parser.parse_args()
+
+    # validate the command line arguments
+    opt_parser.check_required("--sig_info")
+    opt_parser.check_required("--gctx")
+    opt_parser.check_required("-c")
+    opt_parser.check_required("-o")
+
+    run_main(sig_info=args.sig_info, gctx = args.gctx,
+                allele_col = args.allele_col, o = args.o, r = args.r,
+                 c = args.c, i = args.i, conn_null = args.conn_null,
+                 ie_col = args.ie_col,  ie_filter = args.ie_filter,
+                 num_reps = args.num_reps, cell_id = args.cell_id,
+                 plate_id = args.plate_id)
 
 
 def run_main(sig_info=None, gctx = None, allele_col = None, o = None, r = None,
@@ -129,10 +239,10 @@ def run_main(sig_info=None, gctx = None, allele_col = None, o = None, r = None,
 
     #calculates if no inputs
     replicate_null_dist, connectivity_null_dist = getNullDist(this_gctx,
-                                                                  allele2distil_id,
-                                                                  clean_controls,
-                                                                  num_iterations,
-                                                                  num_reps)
+                                                            allele2distil_id,
+                                                            clean_controls,
+                                                            num_iterations,
+                                                            num_reps)
 
 
 
@@ -148,8 +258,9 @@ def run_main(sig_info=None, gctx = None, allele_col = None, o = None, r = None,
 
 
 
-    WT_dict, wt_rep_pvals, wt_ordered = buildWT_dict(this_gctx, allele2distil_id, WT_alleles, replicate_null_dist,
-                                                     num_reps)
+    WT_dict, wt_rep_pvals, wt_ordered = buildWT_dict(this_gctx,
+                                                    allele2distil_id, WT_alleles,
+                                                    replicate_null_dist, num_reps)
 
     # Print header to output file
     output_file_prefix.write("gene\tmut\tmut_rep\twt_rep\tmut_wt_connectivity\t")
@@ -172,17 +283,17 @@ def run_main(sig_info=None, gctx = None, allele_col = None, o = None, r = None,
             continue
 
         mut_rankpt, mut_rankpt_dist = getSelfConnectivity(this_gctx,
-                                                          allele2distil_id[allele],
-                                                          num_reps)
+                                                    allele2distil_id[allele],
+                                                    num_reps)
 
         self_pval = getPairwiseComparisons(mut_rankpt_dist,
                                            replicate_null_dist)
         mut_rep_pvals.append(self_pval)
 
         mut_wt_conn_rankpt, mut_wt_conn_dist = getConnectivity(this_gctx,
-                                                               allele2distil_id[allele],
-                                                               allele2distil_id[allele2WT[allele]],
-                                                               num_reps)
+                                                    allele2distil_id[allele],
+                                                    allele2distil_id[allele2WT[allele]],
+                                                    num_reps)
 
         conn_pval = getPairwiseComparisons(mut_wt_conn_dist,
                                            connectivity_null_dist)
@@ -199,30 +310,10 @@ def run_main(sig_info=None, gctx = None, allele_col = None, o = None, r = None,
         mut_wt_rep_vs_wt_mut_conn_pvals.append(wt_mut_rep_vs_wt_mut_conn_pval)
 
 
-        # print('WT_dict[allele2WT[allele]]["wt_rep_dist"]')
-        # print(WT_dict[allele2WT[allele]]["wt_rep_dist"])
-        # print(median(WT_dict[allele2WT[allele]]["wt_rep_dist"]))
-        #
-        # print("mut_rankpt_dist")
-        # print(mut_rankpt_dist)
-        # print(median(mut_rankpt_dist))
-        #
-        #
-        # print("mut_wt_conn_dist")
-        # print(mut_wt_conn_dist)
-        # print(median(mut_wt_conn_dist))
-
         medians = []
-
         medians.append(median(WT_dict[allele2WT[allele]]["wt_rep_dist"]))
         medians.append(median(mut_rankpt_dist))
         medians.append(median(mut_wt_conn_dist))
-
-        # print(max(medians))
-        # print(min(medians))
-        #
-        # print("\n")
-        # print(max(medians)-min(medians))
 
         median_diff = max(medians)-min(medians)
 
@@ -271,7 +362,8 @@ def median(lst):
     s = sorted(lst)
     return (sum(s[n//2-1:n//2+1])/2.0, s[n//2])[n % 2] if n else None
 
-def buildWT_dict(this_gctx, allele2distil_id, WT_alleles, replicate_null_dist, num_reps):
+def buildWT_dict(this_gctx, allele2distil_id, WT_alleles,
+                    replicate_null_dist, num_reps):
     """
     {WT_allele:{"wt_rep": med_wt_rep,
                 "wt_rep_dist":[]
@@ -308,9 +400,10 @@ def formatLine(line):
     return line
 
 def getKruskal(wt_rankpt_dist, mut_rankpt_dist, mut_wt_conn_dist):
-    return robjects.r["kruskal.test"](robjects.ListVector({'a':robjects.FloatVector(wt_rankpt_dist),
-                                                           'b':robjects.FloatVector(mut_rankpt_dist),
-                                                           'c':robjects.FloatVector(mut_wt_conn_dist)}))[2][0]
+    return robjects.r["kruskal.test"](robjects.ListVector(
+                                    {'a':robjects.FloatVector(wt_rankpt_dist),
+                                    'b':robjects.FloatVector(mut_rankpt_dist),
+                                    'c':robjects.FloatVector(mut_wt_conn_dist)}))[2][0]
 
 
 def getSelfConnectivity(this_gctx, distil_ids, num_reps):
@@ -466,7 +559,8 @@ def parseRefTestFile(reference_test_filename):
 
     return ref2test
 
-def parse_sig_info(sig_info_file, ref2test_allele, allele_col, ie_col, ie_filter = None, cell_id = None, plate_id = None):
+def parse_sig_info(sig_info_file, ref2test_allele, allele_col, ie_col,
+                    ie_filter = None, cell_id = None, plate_id = None):
     """
     Returns:
     allele2distil_id = {}

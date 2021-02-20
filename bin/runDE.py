@@ -2,7 +2,8 @@
 # Adapted from runDE.py in FLAIR
 # https://github.com/BrooksLabUCSC/flair
 # Original author: Cameron M. Soulette
-#
+# Updated by Alexis M. Thornton
+
 ########################################################################
 
 import os, sys
