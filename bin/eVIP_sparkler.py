@@ -86,6 +86,104 @@ class OptionParser(optparse.OptionParser):
 # END CLASSES #
 ###############
 
+########
+# MAIN #
+########
+def main():
+
+    opt_parser = OptionParser()
+
+    # Add Options. Required options should have default=None
+    opt_parser.add_option("--pred_file",
+                          dest="pred_file",
+                          type="string",
+                          help="""File containing the mutation impact
+                                  predictions""",
+                          default=None)
+    opt_parser.add_option("--ref_allele_mode",
+                          dest="ref_allele_mode",
+                          action="store_true",
+                          help="""Instead of organizing plots by gene, will use
+                                  the wt column to determine what are the
+                                  reference alleles.""",
+                          default=False)
+    opt_parser.add_option("--x_thresh",
+                          dest="x_thresh",
+                          type="float",
+                          help="Threshold of significance",
+                          default=1.3)
+    opt_parser.add_option("--y_thresh",
+                          dest="y_thresh",
+                          type="float",
+                          help="Threshold of impact direction",
+                          default=1.3)
+    opt_parser.add_option("--use_c_pval",
+                          dest="use_c_pval",
+                          action="store_true",
+                          help="Use corrected p-val instead of raw p-val",
+                          default=False)
+    opt_parser.add_option("--annotate",
+                          dest="annotate",
+                          action="store_true",
+                          help="Will add allele labels to points.",
+                          default=False)
+    opt_parser.add_option("--by_gene_color",
+                          dest="by_gene_color",
+                          type="string",
+                          help="""File containing labels and colors for
+                                  gene-cenric plot""",
+                          default=None)
+    opt_parser.add_option("--out_dir",
+                          dest="out_dir",
+                          type="string",
+                          help="Output directory to put figures",
+                          default=None)
+    opt_parser.add_option("--pdf",
+                          dest="pdf",
+                          action="store_true",
+                          help="Will print plots in pdf format instead of png",
+                          default=False)
+    opt_parser.add_option("--xmin",
+                          dest="xmin",
+                          type="float",
+                          help="Min value of x-axis. DEF=0" ,
+                          default=0)
+    opt_parser.add_option("--xmax",
+                          dest="xmax",
+                          type="float",
+                          help="Max value of x-axis. DEF=4.0" ,
+                          default=4.0)
+    opt_parser.add_option("--ymin",
+                          dest="ymin",
+                          type="float",
+                          help="Min value of y-axis. DEF=-3.0",
+                          default=-3)
+    opt_parser.add_option("--ymax",
+                          dest="ymax",
+                          type="float",
+                          help="Max value of y-axis. DEF=3.0",
+                          default=3)
+
+    (options, args) = opt_parser.parse_args()
+
+    # validate the command line arguments
+    opt_parser.check_required("--pred_file")
+    opt_parser.check_required("--x_thresh")
+    opt_parser.check_required("--y_thresh")
+    # opt_parser.check_required("--by_gene_color")
+    opt_parser.check_required("--out_dir")
+
+    eVIP_run_main(pred_file=options.pred_file,
+                    ref_allele_mode=options.ref_allele_mode,
+                    y_thresh=options.y_thresh, x_thresh=options.x_thresh,
+                    use_c_pval=options.use_c_pval, annotate=options.annotate,
+                    by_gene_color=options.by_gene_color, pdf=options.pdf,
+                    xmin=options.xmin, xmax=options.xmax, ymin=options.ymin,
+                    ymax=options.ymax, out_dir=options.out_dir)
+
+############
+# END_MAIN #
+############
 
 def eVIP_run_main(pred_file=None, ref_allele_mode=None, y_thresh=None,
                     x_thresh=None, use_c_pval=None, annotate=None,
@@ -294,10 +392,6 @@ def eVIP_run_main(pred_file=None, ref_allele_mode=None, y_thresh=None,
 
     plt.close(this_fig)
 
-
-############
-# END_MAIN #
-############
 
 #############
 # FUNCTIONS #

@@ -22,6 +22,8 @@ import numpy as np
 import scipy.spatial.distance as distance
 import scipy.cluster.hierarchy as sch
 import cmapPy.pandasGEXpress.parse_gct as gct
+import warnings
+warnings.filterwarnings("ignore")
 
 from eVIP_compare import getSelfConnectivity, getConnectivity
 
@@ -126,11 +128,11 @@ def main():
     opt_parser.add_option("--ymin",
                           dest="ymin",
                           type="int",
-                          help="Minimum y-value of rep value. DEF= -1)
+                          help="Minimum y-value of rep value. DEF= -1")
     opt_parser.add_option("--ymax",
                           dest="ymax",
                           type="int",
-                          help="Maximum y-value of rep value. DEF= 1)
+                          help="Maximum y-value of rep value. DEF= 1")
     opt_parser.add_option("--corr_val_str",
                           dest="corr_val_str",
                           type="string",
