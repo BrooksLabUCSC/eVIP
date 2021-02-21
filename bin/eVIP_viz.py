@@ -136,7 +136,8 @@ def main():
     opt_parser.add_option("--corr_val_str",
                           dest="corr_val_str",
                           type="string",
-                          help="String used to label the correlation value. DEF=\"%s\"" % DEF_CORR_VAL_STR,
+                          help='''String used to label the correlation value.
+                          DEF=\"%s\"''' % DEF_CORR_VAL_STR,
                           default=DEF_CORR_VAL_STR)
     opt_parser.add_option("--allele_col",
                           dest="allele_col",
@@ -624,10 +625,12 @@ def plot_signatures(pdf, out_dir, sig_gctx_frame, wt_allele, mut_allele,
             this_ax.set_ylim(Z_MIN,Z_MAX)
 
     if pdf:
-        this_fig.savefig("%s/%s_%s_scatter_plots.pdf" % (out_dir, wt_allele, mut_allele),
+        this_fig.savefig("%s/%s_%s_scatter_plots.pdf" %
+                        (out_dir, wt_allele, mut_allele),
                          format="pdf")
     else:
-        this_fig.savefig("%s/%s_%s_scatter_plots.png" % (out_dir, wt_allele, mut_allele))
+        this_fig.savefig("%s/%s_%s_scatter_plots.png"
+                        % (out_dir, wt_allele, mut_allele))
 
     plt.close(this_fig)
 #################

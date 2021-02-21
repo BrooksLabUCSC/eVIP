@@ -50,7 +50,8 @@ def main(infile=None, zscore_gct = None, out_directory=None, sig_info =None,
                         to do. Assumes the file has a header. The first column
                         is the reference allele and second column is test allele.""")
     parser.add_argument("-num_reps",required=True,
-                        help = "Number of replicates expected for each allele. DEF=3")
+                        help = "Number of replicates expected for each allele. DEF=3",
+                        default=3)
     parser.add_argument("-ie_filter",
                         help = """L1000 threshold for infection efficiency. Any
                         wildtype or mutant alleles having an ie below this threshold,
@@ -87,6 +88,12 @@ def main(infile=None, zscore_gct = None, out_directory=None, sig_info =None,
                         sig_info file.""")
     parser.add_argument("-plate_id", help = """Optional: Will only look at
                         signatures from this plate""")
+
+    parser.add_argument("--cond_max_diff_thresh",
+                        help = """Threshold for maximum difference between
+                        condition correlation medians when determining if variant
+                        is not neutral. Default = 0.2""",type=float,default=0.2)
+
 
     #from sparkler
     parser.add_argument("-ref_allele_mode", action ="store_true",
@@ -191,7 +198,8 @@ def run_eVIP(wtcs_gct = None, infile=None, zscore_gct = None, out_directory=None
                 o= out_directory+"/predict", conn_thresh=args.conn_thresh,
                 mut_wt_rep_thresh=args.mut_wt_rep_thresh,
                 mut_wt_rep_rank_diff=args.mut_wt_rep_rank_diff,
-                disting_thresh=args.disting_thresh, use_c_pval=args.use_c_pval)
+                disting_thresh=args.disting_thresh, use_c_pval=args.use_c_pval,
+                cond_median_max_diff_thresh=args.cond_max_diff_thresh)
 
 
     if not args.sparkler_off:

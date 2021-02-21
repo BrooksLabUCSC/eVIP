@@ -1,6 +1,5 @@
 #!/usr/bin/python
 
-
 #!/broad/software/free/Linux/redhat_5_x86_64/pkgs/python_2.5.4/bin/python
 # <Script name>
 # Author: Angela Brooks
@@ -10,13 +9,11 @@
 # Copyright (c) 2011, Angela Brooks. anbrooks@gmail.com
 # All rights reserved.
 
-
 import sys
 import optparse
 import os
 import pdb
 import csv
-
 
 ###########
 # CLASSES #
@@ -35,7 +32,6 @@ class OptionParser(optparse.OptionParser):
             print "%s option not supplied" % option
             self.print_help()
             sys.exit(1)
-
 
 ###############
 # END CLASSES #
@@ -61,47 +57,41 @@ def main():
                           help="""Output table with mutation impact predictions
                                   based on different methods""",
                           default=None)
-
     opt_parser.add_option("--conn_thresh",
                           dest="conn_thresh",
                           type="float",
                           help="P-value threshould for connectivity vs null.",
-                          default=None)
+                          default=0.05)
     opt_parser.add_option("--mut_wt_rep_thresh",
                           dest="mut_wt_thresh",
                           type="float",
                           help="""P-value threshould for comparison of WT and mut
                                   robustness""",
-                          default=None)
+                          default=0.05)
     opt_parser.add_option("--mut_wt_rep_rank_diff",
                           dest="mut_wt_rep_diff",
                           type="float",
                           help="""The minimum difference in median rankpoint
                                   between WT and mut to consider a difference.
-                                  DEF=5""" ,
-                          default=5)
+                                  DEF=0""" ,
+                          default=0)
     opt_parser.add_option("--disting_thresh",
                           dest="disting_thresh",
                           type="float",
                           help="""P-value threshould that tests if mut and wt reps
                                   are indistinguishable from each other""",
-                          default=None)
-
+                          default=0.05)
     opt_parser.add_option("--use_c_pval",
                           dest="use_c_pval",
                           action="store_true",
                           help="Will use corrected p-value instead of raw p-val",
                           default=False)
-
     opt_parser.add_option("--cond_median_max_diff_thresh",
                           dest="cond_median_max_diff_thresh",
-                          action="store_true",
-                          help=""""Threshold for maximum difference between
+                          help="""Threshold for maximum difference between
                           condition correlation medians when determining if
                            variant is not neutral. Default = 0.2""",
                           default=0.2)
-
-
 
     (options, args) = opt_parser.parse_args()
 
@@ -110,6 +100,7 @@ def main():
     opt_parser.check_required("-o")
     opt_parser.check_required("--mut_wt_rep_thresh")
     opt_parser.check_required("--disting_thresh")
+
 
     run_main(i=options.input_table, o= options.output_table,
             conn_thresh=options.conn_thresh,
@@ -125,17 +116,14 @@ def run_main(i=None, o= None, conn_thresh=None, mut_wt_rep_thresh=None,
             use_c_pval=None, cond_median_max_diff_thresh=None):
 
     #setting default values
-    mut_wt_rep_thresh = float(mut_wt_rep_thresh) if mut_wt_rep_thresh != None else float(.1)
-    mut_wt_rep_rank_diff = float(mut_wt_rep_rank_diff) if mut_wt_rep_rank_diff != None else float(0)
-    disting_thresh = float(disting_thresh) if disting_thresh != None else float(.1)
     c_thresh = float(conn_thresh) if conn_thresh != None else float(.1)
+    mut_wt_thresh = float(mut_wt_rep_thresh) if mut_wt_rep_thresh != None else float(.1)
+    mut_wt_rep_diff = float(mut_wt_rep_rank_diff) if mut_wt_rep_rank_diff != None else float(0)
+    disting_thresh = float(disting_thresh) if disting_thresh != None else float(.1)
+    cond_median_max_diff_thresh = float(cond_median_max_diff_thresh) if cond_median_max_diff_thresh != None else float(.2)
 
     input_table = open(i)
     output = open(o+".txt", "w")
-
-    mut_wt_thresh = float(mut_wt_rep_thresh)
-    disting_thresh = float(disting_thresh)
-    mut_wt_rep_diff = float(mut_wt_rep_rank_diff)
 
     file_reader = csv.DictReader(input_table, delimiter="\t")
 
@@ -235,6 +223,7 @@ def get_prediction_6(wt_rep, mut_rep, mut_wt_rep_pval,
 #           if mut_wt_conn < conn_null_med:
 #               return "DOM-NEG"
 
+        #is diff between the max and min of the 3 comparisons from kruskal> threshold
         if cond_median_max_diff > cond_median_max_diff_thresh:
 
             if mut_wt_rep_pval < mut_wt_thresh:
