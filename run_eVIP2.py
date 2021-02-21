@@ -1,7 +1,4 @@
-########################################################################
-# author: Alexis M. Thornton
-#
-########################################################################
+# Author: Alexis M. Thornton
 
 #!/usr/bin/python
 import sys
@@ -36,72 +33,148 @@ from bin import tx2gene
 ########
 # MAIN #
 ########
-def main(infile=None, zscore_gct = None, out_directory=None, sig_info =None, c=None, r=None, num_reps=None,
-         ie_filter=None,ie_col=None, i=None, allele_col=None, conn_null=None, conn_thresh=None,
-         mut_wt_rep_rank_diff=None, use_c_pval=None, cell_id=None, plate_id=None, ref_allele_mode=None,
-         x_thresh=None, y_thresh=None, annotate=None, by_gene_color=None, pdf=None, xmin=None,
-         xmax=None, ymin=None, ymax=None, viz_ymin=None, viz_ymax=None, corr_val=None):
+def main(infile=None, zscore_gct = None, out_directory=None, sig_info =None,
+        c=None, r=None, num_reps=None,ie_filter=None,ie_col=None, i=None,
+        allele_col=None, conn_null=None, conn_thresh=None,
+        mut_wt_rep_rank_diff=None, use_c_pval=None, cell_id=None, plate_id=None,
+        ref_allele_mode=None,x_thresh=None, y_thresh=None, annotate=None,
+        by_gene_color=None, pdf=None, xmin=None,xmax=None, ymin=None, ymax=None,
+        viz_ymin=None, viz_ymax=None, corr_val=None):
 
     parser = argparse.ArgumentParser()
 
     #from filter gene expression table
-    parser.add_argument("-min_tpm", help = "minimum TPM value for a given gene. If the gene is expressed below this level in all samples, the gene is filtered from the table. DEFAULT=1",default=1,type=float)
+    parser.add_argument("-min_tpm", help = """minimum TPM value for a given
+                gene. If the gene is expressed below this level in all samples,
+                the gene is filtered from the table. DEFAULT=1""",
+                default=1,type=float)
 
     #from corr
-    parser.add_argument("--infile", help="Input txt file (filtered and log transformed data).")
-    parser.add_argument("-zscore_gct", help="Zscore input gct file (use instead of --infile)")
-    parser.add_argument("-out_directory",required=True, help="Path to directory for eVIP output files")
+    parser.add_argument("--infile", help="""Input txt file (filtered and
+                log transformed data).""")
+    parser.add_argument("-zscore_gct", help="""Zscore input gct file (use
+                instead of --infile)""")
+    parser.add_argument("-out_directory",required=True, help="""Path to directory
+                for eVIP output files""")
     #from compare
-    parser.add_argument("-sig_info",required=True, help = "sig info file with gene information and distil information")
-    parser.add_argument("-c",required=True, help = ".grp file containing allele names of control perturbations. If this file is given, a null will be calculated from these")
-    parser.add_argument("-r", required=True, help = "File explicitly indicating which comparisons to do. Assumes the file has a header and it is ignored. The first column is the reference allele and second column is test allele. If this file is not given, then the reference alleles are assumed to be WT and inferred from the allele names.")
-    parser.add_argument("-num_reps",required=True, help = "Number of replicates expected for each allele. DEF=3")
-    parser.add_argument("-ie_filter", help = "Threshold for infection efficiency. Any wildtype or mutant alleles having an ie below this threshold, will be removed")
-    parser.add_argument("-ie_col", help = "Name of the column in the sig_info file with infection efficiency information. DEF=x_ie_a549")
+    parser.add_argument("-sig_info",required=True, help = """sig info file with
+                gene information and distil information""")
+    parser.add_argument("-c",required=True, help = """.grp file containing
+                allele names of control perturbations. If this file is given,
+                a null will be calculated from these""")
+    parser.add_argument("-r", required=True, help = """File explicitly
+                indicating which comparisons to do. Assumes the file has a
+                header and it is ignored. The first column is the reference
+                allele and second column is test allele. If this file is not
+                given, then the reference alleles are assumed to be WT and
+                inferred from the allele names.""")
+    parser.add_argument("-num_reps",required=True, help = """Number of
+                replicates expected for each allele. DEF=3""")
+    parser.add_argument("-ie_filter", help = """Threshold for infection
+                efficiency. Any wildtype or mutant alleles having an ie below
+                this threshold, will be removed""")
+    parser.add_argument("-ie_col", help = """Name of the column in the sig_info
+                file with infection efficiency information. DEF=x_ie_a549""")
     parser.add_argument("-i", help = "Number of iterations to run. DEF=1000")
-    parser.add_argument("-allele_col", help = "Column name in sig_info file that indicates the allele names.DEF=x_mutation_status")
-    parser.add_argument("-conn_null", help = " Optional file containing connectivity null values from a previous run. Should end in _conn_null.txt")
+    parser.add_argument("-allele_col", help = """Column name in sig_info file
+                that indicates the allele names.DEF=x_mutation_status""")
+    parser.add_argument("-conn_null", help = """ Optional file containing
+                connectivity null values from a previous run. Should end
+                in _conn_null.txt""")
     #from predict
-    parser.add_argument("-conn_thresh",help = "P-value threshold for connectivity vs null. DEFAULT=0.1",default=.1,type=float)
-    parser.add_argument("-mut_wt_rep_thresh", help = "P-value threshold for comparison of WT and mut robustness. DEFAULT=0.1",default=.1,type=float)
-    parser.add_argument("-disting_thresh", help = "P-value threshold that tests if mut and wt reps are indistinguishable from each other. DEFAULT=0.1",default=.1,type=float)
-    parser.add_argument("-mut_wt_rep_rank_diff", help = "The minimum difference in median rankpoint WT and mut to consider a difference. DEF=0")
-    parser.add_argument("-use_c_pval", action ="store_true", help = "Will use corrected p-value instead of raw p-val")
-    parser.add_argument("-cell_id", help = "Optional: Will only look at signatures from this cell line. Helps to filter sig_info file.")
-    parser.add_argument("-plate_id", help = "Optional: Will only look at signatures from this plate")
-
-    parser.add_argument("-cond_max_diff_thresh", help = "Threshold for maximum difference between condition correlation medians when determining if variant is not neutral. Default = 0.2",type=float,default=0.2)
-
+    parser.add_argument("-conn_thresh",help = """P-value threshold for
+                connectivity vs null. DEFAULT=0.1""",
+                default=.1,type=float)
+    parser.add_argument("-mut_wt_rep_thresh",
+                help = """P-value threshold for comparison of WT and mut
+                robustness. DEFAULT=0.1""",
+                default=.1, type=float)
+    parser.add_argument("-disting_thresh", help = """P-value threshold that
+                tests if mut and wt reps are indistinguishable from each other.
+                DEFAULT=0.1""",
+                default=.1,type=float)
+    parser.add_argument("-mut_wt_rep_rank_diff", help = """The minimum
+                difference in median rankpoint WT and mut to consider a
+                difference. DEF=0""")
+    parser.add_argument("-use_c_pval", action ="store_true",
+                help = "Will use corrected p-value instead of raw p-val")
+    parser.add_argument("-cell_id",
+                help = """Optional: Will only look at signatures from this cell
+                line. Helps to filter sig_info file.""")
+    parser.add_argument("-plate_id",
+                help = "Optional: Will only look at signatures from this plate")
+    parser.add_argument("-cond_max_diff_thresh",
+                help = """Threshold for maximum difference between condition
+                correlation medians when determining if variant is not neutral.
+                Default = 0.2""",
+                type=float,default=0.2)
 
     #from sparkler
-    parser.add_argument("-ref_allele_mode", action ="store_true", help = "Sparkler+Viz: Instead of organizing plots by gene, will use the wt column to determine what are the reference alleles." )
-    parser.add_argument("-x_thresh" , help = "Sparkler: Threshold of significance",default=1.3,type=float)
-    parser.add_argument("-y_thresh", help = "Sparkler: Threshold of impact direction",default=1.3,type=float)
-    parser.add_argument("-annotate", action ="store_true", help = "Sparkler: Will add allele labels to points.")
-    parser.add_argument("-by_gene_color", help = "Sparkler: File containing labels and colors for gene-centric plot.")
-    parser.add_argument("-pdf", help = "Sparkler + Viz: Will print plots in pdf format instead of png.")
-    parser.add_argument("-xmin", help = "Sparkler: Min value of x-axis. DEF=0")
-    parser.add_argument("-xmax", help = "Sparkler: Max value of x-axis. DEF=4")
-    parser.add_argument("-ymin", help = "Sparkler: Min value of y-axis. DEF=-3")
-    parser.add_argument("-ymax", help = "Sparkler: Min value of y-axis. DEF=3")
+    parser.add_argument("-ref_allele_mode", action ="store_true",
+                help = """Sparkler+Viz: Instead of organizing plots by gene,
+                will use the wt column to determine what are the reference
+                alleles.""" )
+    parser.add_argument("-x_thresh" ,
+                help = "Sparkler: Threshold of significance",
+                default=1.3,type=float)
+    parser.add_argument("-y_thresh",
+                help = "Sparkler: Threshold of impact direction",
+                default=1.3,type=float)
+    parser.add_argument("-annotate", action ="store_true",
+                help = "Sparkler: Will add allele labels to points.")
+    parser.add_argument("-by_gene_color",
+                help = """Sparkler: File containing labels and colors for
+                gene-centric plot.""")
+    parser.add_argument("-pdf",
+                help = """Sparkler + Viz: Will print plots in pdf format instead
+                of png.""")
+    parser.add_argument("-xmin",
+                help = "Sparkler: Min value of x-axis. DEF=0")
+    parser.add_argument("-xmax",
+                help = "Sparkler: Max value of x-axis. DEF=4")
+    parser.add_argument("-ymin",
+                help = "Sparkler: Min value of y-axis. DEF=-3")
+    parser.add_argument("-ymax",
+                help = "Sparkler: Min value of y-axis. DEF=3")
     #from viz
-    parser.add_argument("-viz_ymin", help = "Viz: Minimum y-value of rep value. DEF=-100")
-    parser.add_argument("-viz_ymax", help = "Viz: Maximum y-value of rep value. DEF=100")
-    parser.add_argument("-corr_val", help = "Viz: String used to label the correlation value. DEF= 'row median rankpoints' ")
+    parser.add_argument("-viz_ymin",
+                help = "Viz: Minimum y-value of rep value. DEF=-100")
+    parser.add_argument("-viz_ymax",
+                help = "Viz: Maximum y-value of rep value. DEF=100")
+    parser.add_argument("-corr_val",
+                help = """Viz: String used to label the correlation value.
+                DEF= 'row median rankpoints' """)
     #eVIPP
-    parser.add_argument("-eVIPP", action ="store_true", help="Use this option when doing pathway analysis, must also have gmt or JSON file ")
-    parser.add_argument("-JSON", help= "JSON file created by create_pathway_JSON.py. Contains dictionary of pathways and the associated ids")
+    parser.add_argument("-eVIPP", action ="store_true",
+                help="""Use this option when doing pathway analysis, must also
+                have gmt or JSON file """)
+    parser.add_argument("-JSON",
+                help= """JSON file created by create_pathway_JSON.py. Contains
+                dictionary of pathways and the associated ids""")
     parser.add_argument("-gmt", help= "Gene set file in .gmt format")
-    parser.add_argument("-min_genes", help = "Minimum amount of pathway genes found in data to run eVIPP on. DEF = 5")
-    parser.add_argument("-viz_off", action ="store_true", help = "Will not perform eVIP viz step")
-    parser.add_argument("-sparkler_off", action ="store_true",help = "Will not perform eVIP sparkler step")
+    parser.add_argument("-min_genes",
+                help = """Minimum amount of pathway genes found in data to run
+                eVIPP on. DEF = 5""")
+    parser.add_argument("-viz_off", action ="store_true",
+                help = "Will not perform eVIP viz step")
+    parser.add_argument("-sparkler_off", action ="store_true",
+                help = "Will not perform eVIP sparkler step")
 
     #run_eVIP2
-    parser.add_argument("-input_dir", help="Path to directory of kallisto outputs")
-    parser.add_argument("-input_gene_tpm", help="Gene tpm table input for eVIP overall prediction")
-    parser.add_argument("-gtf", help="Gtf file used to convert transcript counts to gene counts")
-    parser.add_argument("-control", required=False, help="If multiple controls in the controls file, designate which to use for deseq2")
-    parser.add_argument("-tx2gene", action ="store_true",required=False, help="Use tximport for transcript to gene conversion when using -input_dir")
+    parser.add_argument("-input_dir",
+                help="Path to directory of kallisto outputs")
+    parser.add_argument("-input_gene_tpm",
+                help="Gene tpm table input for eVIP overall prediction")
+    parser.add_argument("-gtf",
+                help="Gtf file used to convert transcript counts to gene counts")
+    parser.add_argument("-control",
+                required=False,
+                help="""If multiple controls in the controls file, designate
+                which to use for deseq2""")
+    parser.add_argument("-tx2gene",
+                action ="store_true",required=False,
+                help="""Use tximport for transcript to gene conversion when
+                using -input_dir""")
 
     global args
     args = parser.parse_args()
@@ -122,8 +195,10 @@ def main(infile=None, zscore_gct = None, out_directory=None, sig_info =None, c=N
         combined_kallisto_transcript_df,all_samples = kallisto_process()
 
         if args.tx2gene:
-            # new version using tximport to combine kallisto into gene counts using kallisto directories
-            tx2gene.main(outDir=args.out_directory+"/kallisto_files/combined_kallisto_abundance_genes.tsv", inDir=args.input_dir, sampleList = all_samples )
+            # new version using tximport to combine kallisto into gene counts
+            # using kallisto directories
+            tx2gene.main(outDir=args.out_directory+"/kallisto_files/combined_kallisto_abundance_genes.tsv",
+                        inDir=args.input_dir, sampleList = all_samples )
 
         else:
             #combining to gene level the original way
@@ -131,12 +206,18 @@ def main(infile=None, zscore_gct = None, out_directory=None, sig_info =None, c=N
 
     #if input gene tpm
     if args.input_gene_tpm:
-        filterGeneExpressionTable.main(in_table=args.input_gene_tpm,out_table=args.out_directory+"/kallisto_files/combined_kallisto_abundance_genes_filtered_transformed.tsv",x = 1,l=True,reformat_gene = None,fpkms = None,min_fpkm = args.min_tpm, min_fold_fpkm = None)
+        filterGeneExpressionTable.main(in_table=args.input_gene_tpm,
+                    out_table=args.out_directory+"/kallisto_files/combined_kallisto_abundance_genes_filtered_transformed.tsv",
+                    x = 1,l=True,reformat_gene = None,fpkms = None,
+                    min_fpkm = args.min_tpm, min_fold_fpkm = None)
 
 
     #filtering out low expressed genes and doing log2 transformation
     print("Filtering out low expressed genes and doing log2 transformation...")
-    filterGeneExpressionTable.main(in_table=args.out_directory+"/kallisto_files/combined_kallisto_abundance_genes.tsv",out_table=args.out_directory+"/kallisto_files/combined_kallisto_abundance_genes_filtered_transformed.tsv",x = 1,l=True,reformat_gene = None,fpkms = None,min_fpkm = args.min_tpm, min_fold_fpkm = None)
+    filterGeneExpressionTable.main(in_table=args.out_directory+"/kallisto_files/combined_kallisto_abundance_genes.tsv",
+                    out_table=args.out_directory+"/kallisto_files/combined_kallisto_abundance_genes_filtered_transformed.tsv",
+                    x = 1,l=True,reformat_gene = None,fpkms = None,
+                    min_fpkm = args.min_tpm, min_fold_fpkm = None)
 
     #run eVIP overall
     overall_eVIP_dir = args.out_directory + "/eVIP_out"
@@ -146,11 +227,14 @@ def main(infile=None, zscore_gct = None, out_directory=None, sig_info =None, c=N
 
 
     print("Running eVIP for overall function...")
-    run_eVIP(args.out_directory+"/kallisto_files/combined_kallisto_abundance_genes_filtered_transformed.tsv", None, overall_eVIP_dir, args.sig_info, args.c, args.r, args.num_reps,
-                 args.ie_filter, args.ie_col, args.i, args.allele_col, args.conn_null, args.conn_thresh,
-                 args.mut_wt_rep_rank_diff, args.use_c_pval, args.cell_id, args.plate_id, args.ref_allele_mode,
-                 args.x_thresh, args.y_thresh, args.annotate, args.by_gene_color, args.pdf, args.xmin,
-                 args.xmax, args.ymin, args.ymax, args.viz_ymin, args.viz_ymax, args.corr_val)
+    run_eVIP(args.out_directory+"/kallisto_files/combined_kallisto_abundance_genes_filtered_transformed.tsv",
+            None, overall_eVIP_dir, args.sig_info, args.c, args.r, args.num_reps,
+            args.ie_filter, args.ie_col, args.i, args.allele_col, args.conn_null,
+            args.conn_thresh,args.mut_wt_rep_rank_diff, args.use_c_pval,
+            args.cell_id, args.plate_id, args.ref_allele_mode,args.x_thresh,
+            args.y_thresh, args.annotate, args.by_gene_color, args.pdf, args.xmin,
+            args.xmax, args.ymin, args.ymax, args.viz_ymin, args.viz_ymax,
+            args.corr_val)
 
 
     #############################################################################
@@ -203,7 +287,8 @@ def main(infile=None, zscore_gct = None, out_directory=None, sig_info =None, c=N
             file_wt = args.out_directory+"/deseq2/"+deseq_control+"_vs_"+wt+"/"+deseq_control+"_v_"+wt+"_deseq2_results.csv"
 
             #get mutation specific and wt specific genes
-            mutspec,wtspec = getSpec.main(wt,mut,deseq_control,file_wt,file_mut,args.out_directory+"/deseq2/figures")
+            mutspec,wtspec = getSpec.main(wt,mut,deseq_control,file_wt,
+                                file_mut,args.out_directory+"/deseq2/figures")
 
             eVIP_gene_expression = pd.read_csv(args.out_directory+"/kallisto_files/combined_kallisto_abundance_genes_filtered_transformed.tsv", sep = "\t")
 
@@ -252,15 +337,24 @@ def main(infile=None, zscore_gct = None, out_directory=None, sig_info =None, c=N
                 os.makedirs(eVIPP_mutspec_out)
 
 
-            eVIPPspec.main(eVIPP_mutspec_out,args.JSON,args.gmt,args.min_genes,mutspec_infile,eVIPP_files+"/"+mut+"_sig.info", args.c, eVIPP_files+"/"+mut+"_comparisons.tsv", args.num_reps,
-            args.ie_filter, args.ie_col, args.i, args.allele_col, args.conn_null, args.conn_thresh,
-            args.mut_wt_rep_rank_diff, args.use_c_pval, args.cell_id, args.plate_id, args.ref_allele_mode,
-            args.x_thresh, args.y_thresh, args.annotate, args.by_gene_color, args.pdf, args.xmin,
-            args.xmax, args.ymin, args.ymax, args.viz_ymin, args.viz_ymax, args.corr_val,args.mut_wt_rep_thresh,args.disting_thresh,args.sparkler_off,args.viz_off,args.cond_max_diff_thresh)
+            eVIPPspec.main(eVIPP_mutspec_out,args.JSON,args.gmt,args.min_genes,
+                        mutspec_infile,eVIPP_files+"/"+mut+"_sig.info",
+                        args.c, eVIPP_files+"/"+mut+"_comparisons.tsv",
+                        args.num_reps,args.ie_filter, args.ie_col, args.i,
+                        args.allele_col, args.conn_null, args.conn_thresh,
+                        args.mut_wt_rep_rank_diff, args.use_c_pval, args.cell_id,
+                        args.plate_id, args.ref_allele_mode,args.x_thresh,
+                        args.y_thresh, args.annotate, args.by_gene_color,
+                        args.pdf, args.xmin,args.xmax, args.ymin, args.ymax,
+                        args.viz_ymin, args.viz_ymax, args.corr_val,
+                        args.mut_wt_rep_thresh,args.disting_thresh,
+                        args.sparkler_off,args.viz_off,args.cond_max_diff_thresh)
 
 
             if os.path.exists(eVIPP_mutspec_out+"/eVIPP_combined_predict_files.txt"):
-                upset_plot.run(args.JSON,args.gmt,mutspec_infile,eVIPP_mutspec_out+"/eVIPP_combined_predict_files.txt",eVIPP_mutspec_out+"/eVIPP_gene_overlap.png")
+                upset_plot.run(args.JSON,args.gmt,mutspec_infile,
+                        eVIPP_mutspec_out+"/eVIPP_combined_predict_files.txt",
+                        eVIPP_mutspec_out+"/eVIPP_gene_overlap.png")
 
 
             ######################################################################
@@ -284,14 +378,23 @@ def main(infile=None, zscore_gct = None, out_directory=None, sig_info =None, c=N
             if not os.path.exists(eVIPP_wtspec_out):
                 os.makedirs(eVIPP_wtspec_out)
 
-            eVIPPspec.main(eVIPP_wtspec_out,args.JSON,args.gmt,args.min_genes,wtspec_infile,eVIPP_files+"/"+mut+"_sig.info", args.c, eVIPP_files+"/"+mut+"_comparisons.tsv", args.num_reps,
-            args.ie_filter, args.ie_col, args.i, args.allele_col, args.conn_null, args.conn_thresh,
-            args.mut_wt_rep_rank_diff, args.use_c_pval, args.cell_id, args.plate_id, args.ref_allele_mode,
-            args.x_thresh, args.y_thresh, args.annotate, args.by_gene_color, args.pdf, args.xmin,
-            args.xmax, args.ymin, args.ymax, args.viz_ymin, args.viz_ymax, args.corr_val,args.mut_wt_rep_thresh,args.disting_thresh,args.sparkler_off,args.viz_off,args.cond_max_diff_thresh)
+            eVIPPspec.main(eVIPP_wtspec_out,args.JSON,args.gmt,args.min_genes,
+                        wtspec_infile,eVIPP_files+"/"+mut+"_sig.info", args.c,
+                        eVIPP_files+"/"+mut+"_comparisons.tsv", args.num_reps,
+                        args.ie_filter, args.ie_col, args.i, args.allele_col,
+                        args.conn_null, args.conn_thresh,args.mut_wt_rep_rank_diff,
+                        args.use_c_pval, args.cell_id, args.plate_id,
+                        args.ref_allele_mode,args.x_thresh, args.y_thresh,
+                        args.annotate, args.by_gene_color, args.pdf, args.xmin,
+                        args.xmax, args.ymin, args.ymax, args.viz_ymin,
+                        args.viz_ymax, args.corr_val,args.mut_wt_rep_thresh,
+                        args.disting_thresh,args.sparkler_off,args.viz_off,
+                        args.cond_max_diff_thresh)
 
             if os.path.exists(eVIPP_wtspec_out+"/eVIPP_combined_predict_files.txt"):
-                upset_plot.run(args.JSON,args.gmt,wtspec_infile,eVIPP_wtspec_out+"/eVIPP_combined_predict_files.txt",eVIPP_wtspec_out+"/eVIPP_gene_overlap.png")
+                upset_plot.run(args.JSON,args.gmt,wtspec_infile,
+                                eVIPP_wtspec_out+"/eVIPP_combined_predict_files.txt",
+                                eVIPP_wtspec_out+"/eVIPP_gene_overlap.png")
 
 
         #####
@@ -354,7 +457,8 @@ def deseq2_wts(comparisons_dict,cond_to_rep_dict,deseq_control,wts):
         df.to_csv(formula_file, sep="\t", index=False)
 
         #run DESeq 2
-        runDE.main(group1=deseq_control, group2=wt, outDir=comparison_dir, inDir=args.input_dir, formula=formula_file)
+        runDE.main(group1=deseq_control, group2=wt, outDir=comparison_dir,
+                    inDir=args.input_dir, formula=formula_file)
 
 def deseq2_muts(comparisons_dict,cond_to_rep_dict,deseq_control):
 
@@ -385,7 +489,8 @@ def deseq2_muts(comparisons_dict,cond_to_rep_dict,deseq_control):
         df.to_csv(formula_file, sep="\t", index=False)
 
         #run DESeq 2
-        runDE.main(group1=deseq_control, group2=mut, outDir=comparison_dir, inDir=args.input_dir, formula=formula_file)
+        runDE.main(group1=deseq_control, group2=mut, outDir=comparison_dir,
+                    inDir=args.input_dir, formula=formula_file)
 
 def condition_to_replicates(sig_info_file):
     cond_to_rep = {}
@@ -415,7 +520,7 @@ def transcript_to_gene_counts(transcript_df):
         try:
             transcript2gene[line['transcript_id']]=line["gene_name"]
             out.write(line['transcript_id'] +"\t"+ line["gene_name"]+ "\n")
-        #when there is no transcript id in gtf line / no gene name for the transcript id
+        #when there is no transcript id in gtf line /no gene name for the transcript id
         except:
             pass
 
@@ -443,7 +548,8 @@ def transcript_to_gene_counts(transcript_df):
 
         gene_data[i] = pd.Series(estimated_counts_per_gene)
 
-    gene_data.to_csv(args.out_directory+"/kallisto_files/combined_kallisto_abundance_genes.tsv", sep="\t", index_label="#gene_id")
+    gene_data.to_csv(args.out_directory+"/kallisto_files/combined_kallisto_abundance_genes.tsv",
+                            sep="\t", index_label="#gene_id")
 
 def kallisto_process():
     print "Processing Kallisto files..."
@@ -474,15 +580,18 @@ def kallisto_process():
     if not os.path.exists(args.out_directory+"/kallisto_files"):
         os.makedirs(args.out_directory+"/kallisto_files")
 
-    data.to_csv(args.out_directory+"/kallisto_files/combined_kallisto_abundance.tsv", sep="\t")
+    data.to_csv(args.out_directory+"/kallisto_files/combined_kallisto_abundance.tsv",
+                        sep="\t")
 
     return data , samples
 
-def run_eVIP(infile=None, zscore_gct = None, out_directory=None, sig_info =None, c=None, r=None, num_reps=None,
-         ie_filter=None,ie_col=None, i=None, allele_col=None, conn_null=None, conn_thresh=None,
-         mut_wt_rep_rank_diff=None, use_c_pval=None, cell_id=None, plate_id=None, ref_allele_mode=None,
-         x_thresh=None, y_thresh=None, annotate=None, by_gene_color=None, pdf=None, xmin=None,
-         xmax=None, ymin=None, ymax=None, viz_ymin=None, viz_ymax=None, corr_val=None):
+def run_eVIP(infile=None, zscore_gct = None, out_directory=None, sig_info =None,
+            c=None, r=None, num_reps=None,ie_filter=None,ie_col=None, i=None,
+            allele_col=None, conn_null=None, conn_thresh=None,
+             mut_wt_rep_rank_diff=None, use_c_pval=None, cell_id=None,
+             plate_id=None, ref_allele_mode=None,x_thresh=None, y_thresh=None,
+             annotate=None, by_gene_color=None, pdf=None, xmin=None,xmax=None,
+             ymin=None, ymax=None, viz_ymin=None, viz_ymax=None, corr_val=None):
 
     #different sig_gctx for exp an z inputs used in viz
 
@@ -493,26 +602,37 @@ def run_eVIP(infile=None, zscore_gct = None, out_directory=None, sig_info =None,
 
     # run eVIP_corr.py
     # print('calculating correlations...')
-    run_corr = eVIP_corr.run_main(input=infile,zscore_gct=zscore_gct, out_dir= out_directory)
+    run_corr = eVIP_corr.run_main(input=infile,zscore_gct=zscore_gct,
+                                    out_dir= out_directory)
 
     # print('comparing...')
-    run_compare = eVIP_compare.run_main(sig_info=sig_info, gctx = out_directory+"/spearman_rank_matrix.gct",
-                allele_col = args.allele_col, o= out_directory+"/compare", r = args.r,
-             c = args.c, i = args.i, conn_null = args.conn_null, ie_col = args.ie_col,
-             ie_filter = args.ie_filter, num_reps = args.num_reps, cell_id = args.cell_id, plate_id = args.plate_id)
+    run_compare = eVIP_compare.run_main(sig_info=sig_info,
+                    gctx = out_directory+"/spearman_rank_matrix.gct",
+                    allele_col = args.allele_col, o= out_directory+"/compare",
+                    r = args.r, c = args.c, i = args.i,
+                    conn_null = args.conn_null, ie_col = args.ie_col,
+                    ie_filter = args.ie_filter, num_reps = args.num_reps,
+                    cell_id = args.cell_id, plate_id = args.plate_id)
 
     # print('predicting...')
-    run_predict = eVIP_predict.run_main(i= out_directory+"/compare.txt", o= out_directory+"/predict", conn_thresh=args.conn_thresh,
-                mut_wt_rep_thresh=args.mut_wt_rep_thresh, mut_wt_rep_rank_diff=args.mut_wt_rep_rank_diff,
-                disting_thresh=args.disting_thresh, use_c_pval=args.use_c_pval,cond_median_max_diff_thresh=args.cond_max_diff_thresh)
+    run_predict = eVIP_predict.run_main(i= out_directory+"/compare.txt",
+                o= out_directory+"/predict", conn_thresh=args.conn_thresh,
+                mut_wt_rep_thresh=args.mut_wt_rep_thresh,
+                mut_wt_rep_rank_diff=args.mut_wt_rep_rank_diff,
+                disting_thresh=args.disting_thresh,
+                use_c_pval=args.use_c_pval,
+                cond_median_max_diff_thresh=args.cond_max_diff_thresh)
 
 
     if not args.sparkler_off:
         # print "making sparkler plots..."
-        run_sparkler = eVIP_sparkler.eVIP_run_main(pred_file = out_directory+"/predict.txt", ref_allele_mode=args.ref_allele_mode,
-                y_thresh = args.y_thresh , x_thresh = args.x_thresh,
-                use_c_pval= args.use_c_pval,annotate=args.annotate, by_gene_color= args.by_gene_color, pdf= args.pdf,
-                xmin= args.xmin, xmax = args.xmax, ymin = args.ymin, ymax = args.ymax, out_dir = out_directory+"/sparkler_plots")
+        run_sparkler = eVIP_sparkler.eVIP_run_main(pred_file = out_directory+"/predict.txt",
+                        ref_allele_mode=args.ref_allele_mode,y_thresh = args.y_thresh ,
+                        x_thresh = args.x_thresh,use_c_pval= args.use_c_pval,
+                        annotate=args.annotate, by_gene_color= args.by_gene_color,
+                        pdf= args.pdf,xmin= args.xmin, xmax = args.xmax,
+                        ymin = args.ymin, ymax = args.ymax,
+                        out_dir = out_directory+"/sparkler_plots")
 
     if not args.viz_off:
         # print "making visualizations..."
@@ -521,10 +641,15 @@ def run_eVIP(infile=None, zscore_gct = None, out_directory=None, sig_info =None,
         else:
             null_conn = out_directory + "/compare_conn_null.txt"
 
-        run_viz = eVIP_viz.eVIP_run_main(pred_file= out_directory+"/predict.txt", sig_info = args.sig_info, gctx=out_directory+"/spearman_rank_matrix.gct",
-                sig_gctx = sig_gctx_val, ref_allele_mode = args.ref_allele_mode, null_conn = null_conn,
-                out_dir = out_directory+"/viz",ymin = args.viz_ymin, ymax= args.viz_ymax, allele_col = args.allele_col, use_c_pval = args.use_c_pval,
-                 pdf = args.pdf, cell_id = args.cell_id, plate_id = args.plate_id, corr_val_str= args.corr_val)
+        run_viz = eVIP_viz.eVIP_run_main(pred_file= out_directory+"/predict.txt",
+                sig_info = args.sig_info,
+                gctx=out_directory+"/spearman_rank_matrix.gct",
+                sig_gctx = sig_gctx_val, ref_allele_mode = args.ref_allele_mode,
+                null_conn = null_conn,out_dir = out_directory+"/viz",
+                ymin = args.viz_ymin, ymax= args.viz_ymax,
+                allele_col = args.allele_col, use_c_pval = args.use_c_pval,
+                pdf = args.pdf, cell_id = args.cell_id, plate_id = args.plate_id,
+                corr_val_str= args.corr_val)
 
 
 #################
