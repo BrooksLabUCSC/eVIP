@@ -69,13 +69,13 @@ def main(infile=None, zscore_gct = None, out_directory=None, sig_info =None,
                 given, then the reference alleles are assumed to be WT and
                 inferred from the allele names.""")
     parser.add_argument("-num_reps",required=True, help = """Number of
-                replicates expected for each allele. DEF=3""")
+                replicates expected for each allele.""")
     parser.add_argument("-ie_filter", help = """Threshold for infection
-                efficiency. Any wildtype or mutant alleles having an ie below
+                efficiency in L1000. Any wildtype or mutant alleles having an ie below
                 this threshold, will be removed""")
     parser.add_argument("-ie_col", help = """Name of the column in the sig_info
-                file with infection efficiency information. DEF=x_ie_a549""")
-    parser.add_argument("-i", help = "Number of iterations to run. DEF=1000")
+                file with infection efficiency information.""")
+    # parser.add_argument("-i", help = "Number of iterations to run. DEF=1000")
     parser.add_argument("-allele_col", help = """Column name in sig_info file
                 that indicates the allele names.DEF=x_mutation_status""")
     parser.add_argument("-conn_null", help = """ Optional file containing
@@ -84,18 +84,18 @@ def main(infile=None, zscore_gct = None, out_directory=None, sig_info =None,
     #from predict
     parser.add_argument("-conn_thresh",help = """P-value threshold for
                 connectivity vs null. DEFAULT=0.1""",
-                default=.1,type=float)
+                default=0.1,type=float)
     parser.add_argument("-mut_wt_rep_thresh",
                 help = """P-value threshold for comparison of WT and mut
                 robustness. DEFAULT=0.1""",
-                default=.1, type=float)
+                default=0.1, type=float)
     parser.add_argument("-disting_thresh", help = """P-value threshold that
                 tests if mut and wt reps are indistinguishable from each other.
                 DEFAULT=0.1""",
-                default=.1,type=float)
+                default=0.1,type=float)
     parser.add_argument("-mut_wt_rep_rank_diff", help = """The minimum
                 difference in median rankpoint WT and mut to consider a
-                difference. DEF=0""")
+                difference. DEF=0""", default=0, type=float)
     parser.add_argument("-use_c_pval", action ="store_true",
                 help = "Will use corrected p-value instead of raw p-val")
     parser.add_argument("-cell_id",
@@ -129,18 +129,24 @@ def main(infile=None, zscore_gct = None, out_directory=None, sig_info =None,
                 help = """Sparkler + Viz: Will print plots in pdf format instead
                 of png.""")
     parser.add_argument("-xmin",
-                help = "Sparkler: Min value of x-axis. DEF=0")
+                help = "Sparkler: Min value of x-axis. DEF=0",
+                type=float,default=0)
     parser.add_argument("-xmax",
-                help = "Sparkler: Max value of x-axis. DEF=4")
+                help = "Sparkler: Max value of x-axis. DEF=4",
+                type=float,default=4)
     parser.add_argument("-ymin",
-                help = "Sparkler: Min value of y-axis. DEF=-3")
+                help = "Sparkler: Min value of y-axis. DEF=-3",
+                type=float,default=-3)
     parser.add_argument("-ymax",
-                help = "Sparkler: Min value of y-axis. DEF=3")
+                help = "Sparkler: Min value of y-axis. DEF=3",
+                type=float,default=3)
     #from viz
     parser.add_argument("-viz_ymin",
-                help = "Viz: Minimum y-value of rep value. DEF=-100")
+                help = "Viz: Minimum y-value of rep value. DEF=-1",
+                type=float,default=-1)
     parser.add_argument("-viz_ymax",
-                help = "Viz: Maximum y-value of rep value. DEF=100")
+                help = "Viz: Maximum y-value of rep value. DEF=1",
+                type=float,default=1)
     parser.add_argument("-corr_val",
                 help = """Viz: String used to label the correlation value.
                 DEF= 'row median rankpoints' """)
@@ -154,7 +160,7 @@ def main(infile=None, zscore_gct = None, out_directory=None, sig_info =None,
     parser.add_argument("-gmt", help= "Gene set file in .gmt format")
     parser.add_argument("-min_genes",
                 help = """Minimum amount of pathway genes found in data to run
-                eVIPP on. DEF = 5""")
+                eVIPP on. DEF = 10""",default=10, type=float)
     parser.add_argument("-viz_off", action ="store_true",
                 help = "Will not perform eVIP viz step")
     parser.add_argument("-sparkler_off", action ="store_true",
@@ -184,6 +190,17 @@ def main(infile=None, zscore_gct = None, out_directory=None, sig_info =None,
     out_dir = args.out_directory
     if not os.path.exists(out_dir):
         os.makedirs(out_dir)
+
+    #must have atleast one kind of input
+    input_types =[args.input_dir , args.input_gene_tpm, args.infile, args.zscore_gct]
+    if all(v is None for v in input_types):
+        print("Error:Input data is missing")
+        sys.exit()
+    #If runnig eVIPP
+    if args.eVIPP :
+        if all(v is None for v in [args.JSON,args.gmt]):
+            print("Error: Must input gmt or JSON pathway file when running eVIPP")
+            sys.exit()
 
 
     #############################################################################
@@ -229,7 +246,7 @@ def main(infile=None, zscore_gct = None, out_directory=None, sig_info =None,
     print("Running eVIP for overall function...")
     run_eVIP(args.out_directory+"/kallisto_files/combined_kallisto_abundance_genes_filtered_transformed.tsv",
             None, overall_eVIP_dir, args.sig_info, args.c, args.r, args.num_reps,
-            args.ie_filter, args.ie_col, args.i, args.allele_col, args.conn_null,
+            args.ie_filter, args.ie_col, None, args.allele_col, args.conn_null,
             args.conn_thresh,args.mut_wt_rep_rank_diff, args.use_c_pval,
             args.cell_id, args.plate_id, args.ref_allele_mode,args.x_thresh,
             args.y_thresh, args.annotate, args.by_gene_color, args.pdf, args.xmin,
@@ -340,7 +357,7 @@ def main(infile=None, zscore_gct = None, out_directory=None, sig_info =None,
             eVIPPspec.main(eVIPP_mutspec_out,args.JSON,args.gmt,args.min_genes,
                         mutspec_infile,eVIPP_files+"/"+mut+"_sig.info",
                         args.c, eVIPP_files+"/"+mut+"_comparisons.tsv",
-                        args.num_reps,args.ie_filter, args.ie_col, args.i,
+                        args.num_reps,args.ie_filter, args.ie_col, None,
                         args.allele_col, args.conn_null, args.conn_thresh,
                         args.mut_wt_rep_rank_diff, args.use_c_pval, args.cell_id,
                         args.plate_id, args.ref_allele_mode,args.x_thresh,
@@ -381,7 +398,7 @@ def main(infile=None, zscore_gct = None, out_directory=None, sig_info =None,
             eVIPPspec.main(eVIPP_wtspec_out,args.JSON,args.gmt,args.min_genes,
                         wtspec_infile,eVIPP_files+"/"+mut+"_sig.info", args.c,
                         eVIPP_files+"/"+mut+"_comparisons.tsv", args.num_reps,
-                        args.ie_filter, args.ie_col, args.i, args.allele_col,
+                        args.ie_filter, args.ie_col, None, args.allele_col,
                         args.conn_null, args.conn_thresh,args.mut_wt_rep_rank_diff,
                         args.use_c_pval, args.cell_id, args.plate_id,
                         args.ref_allele_mode,args.x_thresh, args.y_thresh,
@@ -609,7 +626,7 @@ def run_eVIP(infile=None, zscore_gct = None, out_directory=None, sig_info =None,
     run_compare = eVIP_compare.run_main(sig_info=sig_info,
                     gctx = out_directory+"/spearman_rank_matrix.gct",
                     allele_col = args.allele_col, o= out_directory+"/compare",
-                    r = args.r, c = args.c, i = args.i,
+                    r = args.r, c = args.c, i = None,
                     conn_null = args.conn_null, ie_col = args.ie_col,
                     ie_filter = args.ie_filter, num_reps = args.num_reps,
                     cell_id = args.cell_id, plate_id = args.plate_id)
