@@ -170,7 +170,6 @@ def main():
     opt_parser.check_required("--pred_file")
     opt_parser.check_required("--x_thresh")
     opt_parser.check_required("--y_thresh")
-    # opt_parser.check_required("--by_gene_color")
     opt_parser.check_required("--out_dir")
 
     eVIP_run_main(pred_file=options.pred_file,
@@ -213,9 +212,7 @@ def eVIP_run_main(pred_file=None, ref_allele_mode=None, y_thresh=None,
 
     x_thresh = getNegLog10(x_thresh, xmax)
     y_thresh = getNegLog10(y_thresh, ymax)
-    annotate = annotate
     pred_col = "prediction"
-    ref_allele_mode = ref_allele_mode
 
     gene2type = None
     if by_gene_color:

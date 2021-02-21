@@ -5,7 +5,7 @@
 import sys
 import optparse
 import os
-import pdb
+# import pdb
 import csv
 import random
 import math
@@ -61,9 +61,9 @@ THRESH_LS = "dotted"
 # MAIN #
 ########
 
-def main(pred_file=None, ref_allele_mode=None, y_thresh=None, x_thresh=None, use_c_pval=None,
-                  annotate=None, by_gene_color=None, pdf=None, xmin=None, xmax=None, ymin=None, ymax=None,
-                  out_dir=None):
+def main(pred_file=None, ref_allele_mode=None, y_thresh=None, x_thresh=None,
+            use_c_pval=None,annotate=None, by_gene_color=None, pdf=None,
+            xmin=None, xmax=None, ymin=None, ymax=None, out_dir=None):
 
     x_thresh = float(x_thresh)
     y_thresh = float(y_thresh)
@@ -92,9 +92,10 @@ def main(pred_file=None, ref_allele_mode=None, y_thresh=None, x_thresh=None, use
 
 
     allele2type = None
+
     if by_gene_color:
         allele2type = parseGeneColor(by_gene_color)
-
+    
 
     (allele2mut_wt,
     allele2mut_wt_rep_p,
@@ -103,8 +104,12 @@ def main(pred_file=None, ref_allele_mode=None, y_thresh=None, x_thresh=None, use
     allele2gene,
     allele2col,
     allele2markerstyle,
-    allele2pathway) = allele_parse_eVIPP_combined_pred_file(pred_file, x_thresh, y_thresh,
-                                         pred_col, use_c_pval, allele2type, ref_allele_mode, xmax, ymax)
+    allele2pathway) = allele_parse_eVIPP_combined_pred_file(pred_file,
+                                                    x_thresh, y_thresh,
+                                                    pred_col, use_c_pval,
+                                                    allele2type,
+                                                    ref_allele_mode,
+                                                    xmax, ymax)
 
     all_mut_wt = []
     all_mut_wt_rep_p = []
@@ -128,82 +133,91 @@ def main(pred_file=None, ref_allele_mode=None, y_thresh=None, x_thresh=None, use
         all_diff_score.extend(allele2diff_score[allele])
         all_markerstyle.extend(allele2markerstyle[allele])
 
+        """
+        print(allele)
+        print(allele2type)
 
-        if allele not in allele2type:
-            allele2type[allele] = "UNKN"
+        if allele2type == None:
+        """
+
+        # if allele not in allele2type:
+            # allele2type[allele] = "UNKN"
 
 
-            (main_markers,
-             neg_markers) = split_data(allele2markerstyle[allele],
-                                        allele2neg_log_p[allele],
-                                       allele2mut_wt_rep_p[allele],
-                                       allele2col[allele])
+        (main_markers,
+         neg_markers) = split_data(allele2markerstyle[allele],
+                                    allele2neg_log_p[allele],
+                                   allele2mut_wt_rep_p[allele],
+                                   allele2col[allele])
 
-            try:
-                plt.scatter(main_markers["x"],
-                            main_markers["y"],
-                            s=MARKER_SIZE,
-                            c=main_markers["col"],
-                            marker=MAIN_MARKER,
-                            edgecolors="none",
-                            linewidth=0)
-            except:
-                pdb.set_trace()
-
-            plt.scatter(neg_markers["x"],
-                        neg_markers["y"],
+        try:
+            plt.scatter(main_markers["x"],
+                        main_markers["y"],
                         s=MARKER_SIZE,
-                        c=neg_markers["col"],
-                        marker=NEG_MARKER,
-                        linewidth=4)
+                        c=main_markers["col"],
+                        marker=MAIN_MARKER,
+                        edgecolors="none",
+                        linewidth=0)
+        except:
+            pass
 
-            for i in range(len(allele2neg_log_p[allele])):
-                this_col = allele2col[allele][i]
-                if this_col == colorConverter.to_rgba("#ffffff", 1):  # white
-                    this_col = "black"
-                plt.plot([0, allele2neg_log_p[allele][i]],
-                         [0, allele2mut_wt_rep_p[allele][i]],
-                         color=this_col,
-                         linewidth=SPARKLER_LINEWIDTH)
+        plt.scatter(neg_markers["x"],
+                    neg_markers["y"],
+                    s=MARKER_SIZE,
+                    c=neg_markers["col"],
+                    marker=NEG_MARKER,
+                    linewidth=4)
+
+        for i in range(len(allele2neg_log_p[allele])):
+            this_col = allele2col[allele][i]
+            if this_col == colorConverter.to_rgba("#ffffff", 1):  # white
+                this_col = "black"
+            plt.plot([0, allele2neg_log_p[allele][i]],
+                     [0, allele2mut_wt_rep_p[allele][i]],
+                     color=this_col,
+                     linewidth=SPARKLER_LINEWIDTH)
 
 
-            plt.axvline(x= x_thresh, color="grey", ls=THRESH_LS)
+        plt.axvline(x= x_thresh, color="grey", ls=THRESH_LS)
 
-            plt.xlim(xmin, xmax)
-            plt.ylim(ymin, ymax)
+        plt.xlim(xmin, xmax)
+        plt.ylim(ymin, ymax)
 
 
-            if annotate:
-                # for i in range(len(allele2gene[allele])):
-                #     ax.annotate(allele2gene[allele][i],
-                #                 (allele2neg_log_p[allele][i],
-                #                  allele2mut_wt_rep_p[allele][i]),
-                #                 textcoords='data')
+        if annotate:
+            # for i in range(len(allele2gene[allele])):
+            #     ax.annotate(allele2gene[allele][i],
+            #                 (allele2neg_log_p[allele][i],
+            #                  allele2mut_wt_rep_p[allele][i]),
+            #                 textcoords='data')
 
-                for i in range(len(allele2gene[allele])):
-                    ax.annotate(allele2pathway[allele][i], (allele2neg_log_p[allele][i], allele2mut_wt_rep_p[allele][i]),rotation=15,size=8, va="bottom")
+            for i in range(len(allele2gene[allele])):
+                ax.annotate(allele2pathway[allele][i],
+                            (allele2neg_log_p[allele][i],
+                            allele2mut_wt_rep_p[allele][i]),
+                            rotation=15,size=8, va="bottom")
 
-            if use_c_pval:
-                ax.set_xlabel("-log10(corrected p-val)")
-            else:
-                ax.set_xlabel("-log10(p-val)")
-            ax.set_ylabel("impact direction score")
+        if use_c_pval:
+            ax.set_xlabel("-log10(corrected p-val)")
+        else:
+            ax.set_xlabel("-log10(p-val)")
+        ax.set_ylabel("impact direction score")
 
-            ax.text(100, -7, "MUT robustness < WT robustness", fontsize="small",
-                    ha="center")
-            ax.text(100, 7, "MUT robustness > WT robustness", fontsize="small",
-                    ha="center")
+        ax.text(100, -7, "MUT robustness < WT robustness", fontsize="small",
+                ha="center")
+        ax.text(100, 7, "MUT robustness > WT robustness", fontsize="small",
+                ha="center")
 
-            predictions = ["GOF", "LOF", "COF", "Neutral"]
-            colors = [GOF_COL, LOF_COL, COF_COL, "black"]
+        predictions = ["GOF", "LOF", "COF", "Neutral"]
+        colors = [GOF_COL, LOF_COL, COF_COL, "black"]
 
-            for i in range(len(colors)):
-                recs.append(mpatches.Rectangle((0, 0), 1, 1, fc=colors[i]))
+        for i in range(len(colors)):
+            recs.append(mpatches.Rectangle((0, 0), 1, 1, fc=colors[i]))
 
-            this_fig.savefig("%s/%s_spark_plots.%s" % (out_dir, allele, format),
-                             format=format)
+        this_fig.savefig("%s/%s_spark_plots.%s" % (out_dir, allele, format),
+                         format=format)
 
-            plt.close(this_fig)
+        plt.close(this_fig)
 
 
         # final plot
@@ -253,7 +267,8 @@ def main(pred_file=None, ref_allele_mode=None, y_thresh=None, x_thresh=None, use
             ax.set_xlabel("-log10(p-val)")
         ax.set_ylabel("impact direction score")
 
-        this_fig.savefig("%s/all_spark_plots.%s" % (out_dir, format), format=format, dpi=400)
+        this_fig.savefig("%s/all_spark_plots.%s" % (out_dir, format),
+                            format=format, dpi=400)
 
         plt.close(this_fig)
 
@@ -291,7 +306,9 @@ def parseGeneColor(by_gene_color_file_name):
     return gene2label
 
 
-def allele_parse_eVIPP_combined_pred_file(pred_file, x_thresh, y_thresh, pred_col, use_c_pval, allele2type, ref_allele_mode, xmax, ymax):
+def allele_parse_eVIPP_combined_pred_file(pred_file, x_thresh, y_thresh,
+                                    pred_col, use_c_pval, allele2type,
+                                    ref_allele_mode, xmax, ymax):
 
     #also making dict for alleles so plots can be done per allele not per gene
 

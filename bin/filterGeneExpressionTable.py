@@ -16,10 +16,10 @@ import math
 #############
 # CONSTANTS #
 #############
-DEF_MIN_FOLD_FPKM = 0.0
-DEF_MIN_FPKM = 1.0
-
-START_VAL_IDX = 1
+# DEF_MIN_FOLD_FPKM = 0.0
+# DEF_MIN_FPKM = 1.0
+#
+# START_VAL_IDX = 1
 INFINITY = 10
 #################
 # END CONSTANTS #
@@ -54,90 +54,12 @@ class OptionParser(optparse.OptionParser):
 ########
 def main(in_table,out_table,x,l,reformat_gene,fpkms,min_fpkm,min_fold_fpkm):
 
-    # opt_parser = OptionParser()
-    #
-    # # Add Options. Required options should have default=None
-    # opt_parser.add_option("--in_table",
-    #                       dest="in_table",
-    #                       type="string",
-    #                       help="Input table of gene expression values",
-    #                       default=None)
-    # opt_parser.add_option("--out_table",
-    #                       dest="out_table",
-    #                       type="string",
-    #                       help="""Filtered output table. Filter is based on FPKM
-    #                               minimum threshold and minimum FPKM difference
-    #                               cutoffs""",
-    #                       default=None)
-    # opt_parser.add_option("-x",
-    #                       dest="start_idx",
-    #                       type="int",
-    #                       help="0-based index of the start of the values. Def=%d" % START_VAL_IDX,
-    #                       default=START_VAL_IDX)
-    # opt_parser.add_option("-l",
-    #                       dest="log2_transform",
-    #                       action="store_true",
-    #                       help="Will log2 transform the data.",
-    #                       default=None)
-    # opt_parser.add_option("--reformat_gene",
-    #                       dest="gene_col",
-    #                       type="int",
-    #                       help="""Will reformat the gene name field if it is split
-    #                               by "|" characters. The gene is in the
-    #                               specified 0-based column""",
-    #                       default=None)
-    # opt_parser.add_option("--fpkms",
-    #                       dest="fpkms",
-    #                       type="string",
-    #                       help="""Optional: Output file listing all fpkms from the input
-    #                               table.""",
-    #                       default=None)
-    # opt_parser.add_option("--min_fpkm",
-    #                       dest="min_fpkm",
-    #                       type="float",
-    #                       help="""Minimum FPKM value for a given gene. If the
-    #                               gene is expressed below this level in all
-    #                               samples, the gene is filtered from the
-    #                               table. DEF=%.2f""" % DEF_MIN_FPKM,
-    #                       default=DEF_MIN_FPKM)
-    # opt_parser.add_option("--min_fold_fpkm",
-    #                       dest="min_fold_fpkm",
-    #                       type="float",
-    #                       help="""If table will be used for differential
-    #                               expression analysis, then the minimum fold
-    #                               difference between the minimum fpkm and
-    #                               maximum fpkm can be used to remove genes.
-    #                               DEF=%.2f""" % DEF_MIN_FOLD_FPKM,
-    #                       default=DEF_MIN_FOLD_FPKM)
-    #
-    # (options, args) = opt_parser.parse_args()
-
-
-    # validate the command line arguments
-    # opt_parser.check_required("--in_table")
-    # opt_parser.check_required("--out_table")
-
     in_table = open(in_table)
     out_table = open(out_table, "w")
-
-    # gene_col = options.gene_col
-    gene_col = reformat_gene
-
-    fpkm_out = None
-    # if options.fpkms:
-    #     fpkm_out = open(options.fpkms, "w")
-
-    # min_fpkm = options.min_fpkm
-    # min_fold_fpkm = options.min_fold_fpkm
-    #
-    # start_idx = options.start_idx
-
     start_idx = x
     log2_transform = l
-
-
-
-    # log2_transform = options.log2_transform
+    gene_col = reformat_gene
+    fpkm_out = None
 
     for line in in_table:
         if line.startswith("#"):
@@ -145,7 +67,6 @@ def main(in_table,out_table,x,l,reformat_gene,fpkms,min_fpkm,min_fold_fpkm):
             continue
 
         line = formatLine(line)
-
 
         fpkms = map(float, line.split("\t")[start_idx:])
 
@@ -225,8 +146,6 @@ def formatLine(line):
     return line
 
 def transform(fpkm_list, log2transform):
-
-
     if log2transform:
         transformed_fpkms = []
         for fpkm in fpkm_list:
