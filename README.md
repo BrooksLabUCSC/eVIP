@@ -14,11 +14,15 @@ The eVIP method was originally described in :
 
 High-throughput Phenotyping of Lung Cancer Somatic Mutations Berger AH, Brooks AN, Wu X, Shrestha Y, Chouinard C, Piccioni F, Bagul M, Kamburov A, Imielinski M, Hogstrom L, Zhu C, Yang X, Pantel S, Sakai R, Watson J, Kaplan N, Campbell JD, Singh S, Root DE, Narayan R, Natoli T, Lahr DL, Tirosh I, Tamayo P, Getz G, Wong B, Doench J, Subramanian A, Golub TR, Meyerson M, Boehm JS. Cancer Cell, Aug 8;30(2):214-28
 
-The eVIP2 method was described in :
+The eVIP2 method was described in and will be available in PLOS Comp Bio soon :
 
 eVIP2: Expression-based variant impact phenotyping to predict the function of gene variants
 Alexis M. Thornton, Lishan Fang, Casey O’Brien, Alice H. Berger, Marios Giannakis, Angela N. Brooks
 bioRxiv 872028; doi: https://doi.org/10.1101/872028
+
+![280x280_2](https://user-images.githubusercontent.com/16394042/122655833-7c497880-d10a-11eb-9ebb-1f3f956fef2f.png)
+
+Art by Cindy Liang [Cindy's twitter](https://twitter.com/abluecorridor)
 
 [Repo for eVIP2 paper analysis](https://github.com/althornt/eVIP2-paper)
 
