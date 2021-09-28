@@ -9,20 +9,18 @@ For pathway analysis, eVIP Pathways first finds differentially expressed genes t
 
 ![venn](https://raw.githubusercontent.com/BrooksLabUCSC/eVIP2/master/misc/venn_image.png)
 
-### How to cite eVIP
-The eVIP method was originally described in :
+### How to cite eVIP and eVIP2
+The eVIP method was originally described in [Berger et al. 2016](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5003022/pdf/nihms-801008.pdf)
 
 High-throughput Phenotyping of Lung Cancer Somatic Mutations Berger AH, Brooks AN, Wu X, Shrestha Y, Chouinard C, Piccioni F, Bagul M, Kamburov A, Imielinski M, Hogstrom L, Zhu C, Yang X, Pantel S, Sakai R, Watson J, Kaplan N, Campbell JD, Singh S, Root DE, Narayan R, Natoli T, Lahr DL, Tirosh I, Tamayo P, Getz G, Wong B, Doench J, Subramanian A, Golub TR, Meyerson M, Boehm JS. Cancer Cell, Aug 8;30(2):214-28
 
-The eVIP2 method was described in and ***will be available in PLOS Comp Bio soon*** :
+The eVIP2 method was described in [Thornton et al. 2021](https://journals.plos.org/ploscompbiol/article/comments?id=10.1371/journal.pcbi.1009132)  
 
-eVIP2: Expression-based variant impact phenotyping to predict the function of gene variants
-Alexis M. Thornton, Lishan Fang, Casey O’Brien, Alice H. Berger, Marios Giannakis, Angela N. Brooks
-bioRxiv 872028; doi: https://doi.org/10.1101/872028
+eVIP2: Expression-based variant impact phenotyping to predict the function of gene variants. Alexis M. Thornton, Lishan Fang, April Lo, Maria McSharry, David Haan, Casey O’Brien, Alice H. Berger , Marios Giannakis , Angela N. Brooks. PLoS Comput Biol. 2021 Jul 2;17(7):e1009132. doi: 10.1371/journal.pcbi.1009132. PMID: 34214079; PMCID: PMC8281988.
 
 ![280x280_2](https://user-images.githubusercontent.com/16394042/122655833-7c497880-d10a-11eb-9ebb-1f3f956fef2f.png)
 
-Art by Cindy Liang [Cindy's twitter](https://twitter.com/abluecorridor)
+Art by Cindy Liang ([Cindy's twitter](https://twitter.com/abluecorridor))
 
 [Repo for eVIP2 paper analysis](https://github.com/althornt/eVIP2-paper)
 
