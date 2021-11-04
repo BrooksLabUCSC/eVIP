@@ -434,8 +434,14 @@ def main(infile=None, zscore_gct = None, out_directory=None, sig_info =None,
         if len(wt_spec_files)> 0:
             wt_spec_combined_df =  make_combined_pathway_df(wt_spec_files)
             wt_spec_combined_df.to_csv(args.out_directory + "/eVIPP_out/all_wt_specific_eVIPP_summary.txt",sep="\t")
-
-
+    
+    # Run the visualization here
+    base_command = "python3 ./bin/generate_visualizations.py"
+    if args.use_c_pval: 
+        base_command = base_command + " --use-c-pval"
+    if args.out_directory != 'tutorial_files/eVIP2_out':
+        base_command = base_command + " -inp-dir " + args.out_directory
+    os.system(base_command)
 
 #############
 # FUNCTIONS #
