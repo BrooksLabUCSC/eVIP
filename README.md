@@ -233,11 +233,9 @@ If plots made by eVIP_viz.py are blank, adjust the min and max.
 
 # Tutorial
 
-This tutorial recreates the eVIP2 results presented in:
+This tutorial recreates the eVIP2 results presented in [Thornton et al. 2021](https://journals.plos.org/ploscompbiol/article/comments?id=10.1371/journal.pcbi.1009132)  :
 
-eVIP2: Expression-based variant impact phenotyping to predict the function of gene variants
-Alexis M. Thornton, Lishan Fang, Casey O’Brien, Alice H. Berger, Marios Giannakis, Angela N. Brooks
-bioRxiv 872028; doi: https://doi.org/10.1101/872028
+
 
 #### Clone eVIP2 github directory
 
