@@ -18,7 +18,7 @@ The eVIP2 method was described in [Thornton et al. 2021](https://journals.plos.o
 
 eVIP2: Expression-based variant impact phenotyping to predict the function of gene variants. Alexis M. Thornton, Lishan Fang, April Lo, Maria McSharry, David Haan, Casey O’Brien, Alice H. Berger , Marios Giannakis , Angela N. Brooks. PLoS Comput Biol. 2021 Jul 2;17(7):e1009132. doi: 10.1371/journal.pcbi.1009132. PMID: 34214079; PMCID: PMC8281988.
 
-[Repo containing eVIP2 paper analysis](https://github.com/althornt/eVIP2-paper)
+[Git repo containing eVIP2 paper analysis](https://github.com/althornt/eVIP2-paper)
 
 
 ### Requirements
@@ -138,6 +138,7 @@ eVIP will create a folder named "eVIP_out" containing the results to the overall
 
 When running eVIP Pathways (`-eVIPP`, `-gmt`, and `-gtf`), the results will be in "eVIPP_out", which will contain be a directory for each mutation. For each mutation, eVIPP is run separately using the wt-specific and mutation-specific genes. The  eVIPP_combined_predict_files.txt  file contains all the results from the individual pathway files combined into one file. eVIPP_summary.txt summarizes  the results, showing the pathway  and its functional prediction. The eVIPP sparkler plot is a combined  visual representation of all the pathway predictions for that mutation. The directory  structure is the same for the wt_specific eVIPP results.
 
+Interactive html sparkler plots are also created ([example](https://htmlpreview.github.io/?https://github.com/BrooksLabUCSC/eVIP2/blob/master/misc/RNF43_G659fs_mutation_specific.html)).
 
 ### Tips
 If plots made by eVIP_viz.py are blank, adjust the min and max.
@@ -259,7 +260,8 @@ Enter the Docker container: `docker run -v /path/to/eVIP2:/eVIP2 -ti althornt/ev
 `python2 run_eVIP2.py -input_dir tutorial_files/RNF43_kallisto_outputs -out_directory tutorial_files/eVIP2_out -sig_info tutorial_files/RNF43_sig.info -c tutorial_files/controls.grp -r tutorial_files/comparisons.tsv -by_gene_color tutorial_files/RNF43_gene_label.tsv -allele_col allele -ie_col 293_ie -num_reps 4 -x_thresh 1.3 -y_thresh 1.3  -ymin -2 -ymax 4 -corr_val "spearman" -use_c_pval -eVIPP -gmt tutorial_files/h.all.v6.0.symbols.gmt -min_genes 10 -annotate -gtf tutorial_files/Homo_sapiens.GRCh38.87.gtf`
 
 Tutorial output for mutation-specific pathways in RNF43 G659fs:
-![280x280_2](https://raw.githubusercontent.com/BrooksLabUCSC/eVIP2/master/misc/RNF43_G659fs_spark_plots.png)
+
+<img src="https://raw.githubusercontent.com/BrooksLabUCSC/eVIP2/master/misc/RNF43_G659fs_spark_plots.png" width="400">
 
 eVIP2 also creates interactive sparkler plots to visualize the
 [overall mutation results](https://htmlpreview.github.io/?https://github.com/BrooksLabUCSC/eVIP2/blob/master/misc/RNF43.html)
