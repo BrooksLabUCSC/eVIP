@@ -1,5 +1,6 @@
 FROM continuumio/miniconda3
 COPY ./environment.yml /
+COPY ./tutorial_files /
 RUN conda env create -f /environment.yml && conda clean -a
 ENV PATH /opt/conda/envs/evip2_env/bin:$PATH
 

@@ -226,25 +226,7 @@ If plots made by eVIP_viz.py are blank, adjust the min and max.
 
 # Tutorial
 
-This tutorial recreates the eVIP2 results presented in:
-
-eVIP2: Expression-based variant impact phenotyping to predict the function of gene variants
-Alexis M. Thornton, Lishan Fang, Casey O’Brien, Alice H. Berger, Marios Giannakis, Angela N. Brooks
-bioRxiv 872028; doi: https://doi.org/10.1101/872028
-
-
-#### Download files
-
-Download the gtf file from ensembl to the tutorial_files folder: `wget http://ftp.ensembl.org/pub/release-87/gtf/homo_sapiens/Homo_sapiens.GRCh38.87.gtf.gz -P tutorial_files/`
-
-decompress the file:
-`gunzip tutorial_files/Homo_sapiens.GRCh38.87.gtf.gz`
-
-Download kallisto files :
-`setup.sh` downloads the abundance.tsv files from [GEO](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE141963) and formats into the original kallisto output directory structure  
-
-`bash tutorial_files/setup.sh`
-
+This tutorial recreates the eVIP2 results presented in [Thornton et al. 2021](https://journals.plos.org/ploscompbiol/article/comments?id=10.1371/journal.pcbi.1009132)  
 
 #### Clone eVIP2 github directory
 
@@ -255,18 +237,32 @@ Pull the Docker container: `docker pull althornt/evip2_env`
 
 Enter the Docker container: `docker run -v /path/to/eVIP2:/eVIP2 -ti althornt/evip2_env`
 
+The Docker container contains all the files needed to run the tutorial command below in `docker_tutorial_files`. Alternatively, `tutorial_files/setup.sh` downloads the abundance.tsv files from [GEO](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE141963) and formats into the original kallisto output directory structure and a gtf file can be downloaded from ensembl usinig `wget http://ftp.ensembl.org/pub/release-87/gtf/homo_sapiens/Homo_sapiens.GRCh38.87.gtf.gz -P tutorial_files/`  
+
 #### Run eVIP2
 
-`python2 run_eVIP2.py -input_dir tutorial_files/RNF43_kallisto_outputs -out_directory tutorial_files/eVIP2_out -sig_info tutorial_files/RNF43_sig.info -c tutorial_files/controls.grp -r tutorial_files/comparisons.tsv -by_gene_color tutorial_files/RNF43_gene_label.tsv -allele_col allele -ie_col 293_ie -num_reps 4 -x_thresh 1.3 -y_thresh 1.3  -ymin -2 -ymax 4 -corr_val "spearman" -use_c_pval -eVIPP -gmt tutorial_files/h.all.v6.0.symbols.gmt -min_genes 10 -annotate -gtf tutorial_files/Homo_sapiens.GRCh38.87.gtf`
+`cd eVIP2`
 
-Tutorial output for mutation-specific pathways in RNF43 G659fs:
+`python2 run_eVIP2.py
+  -input_dir ../docker_tutorial_files/RNF43_kallisto_outputs
+  -out_directory tutorial_files/eVIP2_out
+  -sig_info tutorial_files/RNF43_sig.info
+  -c tutorial_files/controls.grp
+  -r tutorial_files/comparisons.tsv
+  -by_gene_color tutorial_files/RNF43_gene_label.tsv
+  -gmt tutorial_files/h.all.v6.0.symbols.gmt
+  -gtf ../docker_tutorial_files/Homo_sapiens.GRCh38.87.gtf
+  -allele_col allele -ie_col 293_ie -num_reps 4
+  -x_thresh 1.3 -y_thresh 1.3  -ymin -2 -ymax 4
+  -corr_val "spearman" -use_c_pval -eVIPP -annotate `
+
+Tutorial output for mutation-specific pathways in RNF43 G659fs (`eVIP2/tutorial_files/eVIP2_out/eVIPP_out/RNF43_G659fs/mutation_specific/eVIPP_sparkler_plots/RNF43_G659fs_spark_plots.png`):
 
 <img src="https://raw.githubusercontent.com/BrooksLabUCSC/eVIP2/master/misc/RNF43_G659fs_spark_plots.png" width="400">
 
 eVIP2 also creates interactive sparkler plots to visualize the
 [overall mutation results](https://htmlpreview.github.io/?https://github.com/BrooksLabUCSC/eVIP2/blob/master/misc/RNF43.html)
-and the [pathway results per mutation](https://htmlpreview.github.io/?https://github.com/BrooksLabUCSC/eVIP2/blob/master/misc/RNF43_G659fs_mutation_specific.html).
-
+and the [pathway results per mutation](https://htmlpreview.github.io/?https://github.com/BrooksLabUCSC/eVIP2/blob/master/misc/RNF43_G659fs_mutation_specific.html). The html files can be found in `eVIP2/tutorial_files/eVIP2_out/`
 
 ____________________
 ![280x280_2](https://user-images.githubusercontent.com/16394042/122655833-7c497880-d10a-11eb-9ebb-1f3f956fef2f.png)
