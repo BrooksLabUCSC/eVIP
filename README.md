@@ -18,19 +18,11 @@ The eVIP2 method was described in [Thornton et al. 2021](https://journals.plos.o
 
 eVIP2: Expression-based variant impact phenotyping to predict the function of gene variants. Alexis M. Thornton, Lishan Fang, April Lo, Maria McSharry, David Haan, Casey O’Brien, Alice H. Berger , Marios Giannakis , Angela N. Brooks. PLoS Comput Biol. 2021 Jul 2;17(7):e1009132. doi: 10.1371/journal.pcbi.1009132. PMID: 34214079; PMCID: PMC8281988.
 
-![280x280_2](https://user-images.githubusercontent.com/16394042/122655833-7c497880-d10a-11eb-9ebb-1f3f956fef2f.png)
-
-Art by Cindy Liang ([Cindy's twitter](https://twitter.com/abluecorridor))
-
-[Repo for eVIP2 paper analysis](https://github.com/althornt/eVIP2-paper)
+[Repo containing eVIP2 paper analysis](https://github.com/althornt/eVIP2-paper)
 
 
 ### Requirements
-There are many requirements for running eVIP2. Users can run eVIP2 within the conda environment provided in **/misc/evip2_env.yaml**. Refer to the conda docs for how to [create an environment from an environment.yml file](https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#creating-an-environment-from-an-environment-yml-file).
-
-Create the environment: `conda env create -f /path/evip_env.yaml`
-
-Activate the environment: `conda activate eVIP_env`
+We provide a [docker container](https://hub.docker.com/r/althornt/evip2_env) to run eVIP2. The requirements are listed in the [environment.yml](https://github.com/BrooksLabUCSC/eVIP2/blob/master/misc/environment.yml) and the [Dockerfile](https://github.com/BrooksLabUCSC/eVIP2/blob/master/misc/Dockerfile) files.
 
 ### Required input files
 
@@ -65,7 +57,7 @@ When running eVIP Pathways (using `-eVIPP`) additional files are required.
 
 `-gtf ` Gtf file used to convert transcript counts to gene counts
 
-`-control` If there is more than one  control in the controls file (-c), designate which should be used for DEseq2
+`-control` If there is more than one control in the controls file (-c), designate which should be used for DEseq2
 
 ### Optional input files
 ##### -by_gene_color
@@ -79,7 +71,7 @@ This file is used to group genes into categories when creating sparkler plots. T
 
 ### eVIP Usage
 
-To run the eVIP pipeline, use run_eVIP.py. We recommend the input data (--infile) has the low expressed genes filtered out and is log2 transformed. This can be done by using the filterGeneExpression.py script
+To run the eVIP pipeline, use run_eVIP.py. We recommend the input data (--infile) has the low expressed genes filtered out and is log2 transformed. This can be done by using the filterGeneExpression.py script.
 
 `run_eVIP.py [-h] [--infile INFILE] [-zscore_gct ZSCORE_GCT]
                    -out_directory OUT_DIRECTORY -sig_info SIG_INFO -c C -r R
@@ -233,27 +225,16 @@ If plots made by eVIP_viz.py are blank, adjust the min and max.
 
 # Tutorial
 
-This tutorial recreates the eVIP2 results presented in [Thornton et al. 2021](https://journals.plos.org/ploscompbiol/article/comments?id=10.1371/journal.pcbi.1009132)  :
+This tutorial recreates the eVIP2 results presented in:
 
+eVIP2: Expression-based variant impact phenotyping to predict the function of gene variants
+Alexis M. Thornton, Lishan Fang, Casey O’Brien, Alice H. Berger, Marios Giannakis, Angela N. Brooks
+bioRxiv 872028; doi: https://doi.org/10.1101/872028
 
-
-#### Clone eVIP2 github directory
-
-Clone the eVIP2 repo to the desired path on your machine: `git clone https://github.com/BrooksLabUCSC/eVIP2.git`
-
-Enter the eVIP2 directory:
-`cd eVIP2`
-
-#### Create eVIP conda environment
-
-Create the environment: `conda env create -f misc/evip2_env.yaml`
-
-Activate the environment: `conda activate evip2_env`
 
 #### Download files
 
 Download the gtf file from ensembl to the tutorial_files folder: `wget http://ftp.ensembl.org/pub/release-87/gtf/homo_sapiens/Homo_sapiens.GRCh38.87.gtf.gz -P tutorial_files/`
-
 
 decompress the file:
 `gunzip tutorial_files/Homo_sapiens.GRCh38.87.gtf.gz`
@@ -261,11 +242,28 @@ decompress the file:
 Download kallisto files :
 `setup.sh` downloads the abundance.tsv files from [GEO](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE141963) and formats into the original kallisto output directory structure  
 
-
 `bash tutorial_files/setup.sh`
 
 
+#### Clone eVIP2 github directory
+
+Clone the eVIP2 repo to the desired path on your machine: `git clone https://github.com/BrooksLabUCSC/eVIP2.git`
+
+#### Set up and enter Docker container
+Pull the Docker container: `docker pull althornt/evip2_env`
+
+Enter the Docker container: `docker run -v /path/to/eVIP2:/eVIP2 -ti althornt/evip2_env`
+
 #### Run eVIP2
 
-`python run_eVIP2.py -input_dir tutorial_files/RNF43_kallisto_outputs -out_directory tutorial_files/eVIP2_out -sig_info tutorial_files/RNF43_sig.info -c tutorial_files/controls.grp -r tutorial_files/comparisons.tsv -by_gene_color tutorial_files/RNF43_gene_label.tsv -allele_col allele -ie_col 293_ie -num_reps 4 -x_thresh 1.3 -y_thresh 1.3  -ymin -2 -ymax 4 -corr_val "spearman" -use_c_pval -eVIPP -gmt tutorial_files/h.all.v6.0.symbols.gmt -min_genes 10 -annotate -gtf tutorial_files/Homo_sapiens.GRCh38.87.gtf`
-`
+`python2 run_eVIP2.py -input_dir tutorial_files/RNF43_kallisto_outputs -out_directory tutorial_files/eVIP2_out -sig_info tutorial_files/RNF43_sig.info -c tutorial_files/controls.grp -r tutorial_files/comparisons.tsv -by_gene_color tutorial_files/RNF43_gene_label.tsv -allele_col allele -ie_col 293_ie -num_reps 4 -x_thresh 1.3 -y_thresh 1.3  -ymin -2 -ymax 4 -corr_val "spearman" -use_c_pval -eVIPP -gmt tutorial_files/h.all.v6.0.symbols.gmt -min_genes 10 -annotate -gtf tutorial_files/Homo_sapiens.GRCh38.87.gtf`
+
+eVIP2 creates interactive sparkler plots for the
+[overall results](https://github.com/BrooksLabUCSC/eVIP2/blob/master/misc/RNF43.html)
+and the [pathway results](https://github.com/BrooksLabUCSC/eVIP2/blob/master/misc/RNF43_G659fs_mutation_specific.html).
+
+
+____________________
+![280x280_2](https://user-images.githubusercontent.com/16394042/122655833-7c497880-d10a-11eb-9ebb-1f3f956fef2f.png)
+
+Art by Cindy Liang ([Cindy's twitter](https://twitter.com/abluecorridor))
