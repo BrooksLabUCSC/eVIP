@@ -258,12 +258,15 @@ Enter the Docker container: `docker run -v /path/to/eVIP2:/eVIP2 -ti althornt/ev
 
 `python2 run_eVIP2.py -input_dir tutorial_files/RNF43_kallisto_outputs -out_directory tutorial_files/eVIP2_out -sig_info tutorial_files/RNF43_sig.info -c tutorial_files/controls.grp -r tutorial_files/comparisons.tsv -by_gene_color tutorial_files/RNF43_gene_label.tsv -allele_col allele -ie_col 293_ie -num_reps 4 -x_thresh 1.3 -y_thresh 1.3  -ymin -2 -ymax 4 -corr_val "spearman" -use_c_pval -eVIPP -gmt tutorial_files/h.all.v6.0.symbols.gmt -min_genes 10 -annotate -gtf tutorial_files/Homo_sapiens.GRCh38.87.gtf`
 
-eVIP2 creates interactive sparkler plots for the
-[overall results](https://github.com/BrooksLabUCSC/eVIP2/blob/master/misc/RNF43.html)
-and the [pathway results](https://github.com/BrooksLabUCSC/eVIP2/blob/master/misc/RNF43_G659fs_mutation_specific.html).
+Tutorial output for mutation-specific pathways in RNF43 G659fs:
+![280x280_2](https://raw.githubusercontent.com/BrooksLabUCSC/eVIP2/master/misc/RNF43_G659fs_spark_plots.png)
+
+eVIP2 also creates interactive sparkler plots to visualize the
+[overall mutation results](https://htmlpreview.github.io/?https://github.com/BrooksLabUCSC/eVIP2/blob/master/misc/RNF43.html)
+and the [pathway results per mutation](https://htmlpreview.github.io/?https://github.com/BrooksLabUCSC/eVIP2/blob/master/misc/RNF43_G659fs_mutation_specific.html).
 
 
 ____________________
 ![280x280_2](https://user-images.githubusercontent.com/16394042/122655833-7c497880-d10a-11eb-9ebb-1f3f956fef2f.png)
 
-Art by Cindy Liang ([Cindy's twitter](https://twitter.com/abluecorridor))
+eVIP art by Cindy Liang ([Cindy's twitter](https://twitter.com/abluecorridor))
