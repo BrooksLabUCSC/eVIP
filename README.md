@@ -251,10 +251,13 @@ The Docker container contains all the files needed to run the tutorial command b
   -r tutorial_files/comparisons.tsv
   -by_gene_color tutorial_files/RNF43_gene_label.tsv
   -gmt tutorial_files/h.all.v6.0.symbols.gmt
-  -gtf ../docker_tutorial_files/Homo_sapiens.GRCh38.87.gtf
-  -allele_col allele -ie_col 293_ie -num_reps 4
-  -x_thresh 1.3 -y_thresh 1.3  -ymin -2 -ymax 4
-  -corr_val "spearman" -use_c_pval -eVIPP -annotate `
+  -gtf ../docker_tutorial_files/Homo_sapiens.GRCh38.87.gtf  
+  -num_reps 4
+  -x_thresh 1.3 -y_thresh 1.3 -ymin -2 -ymax 4
+  -use_c_pval
+  -eVIPP `
+
+
 
 Tutorial output for mutation-specific pathways in RNF43 G659fs (`eVIP2/tutorial_files/eVIP2_out/eVIPP_out/RNF43_G659fs/mutation_specific/eVIPP_sparkler_plots/RNF43_G659fs_spark_plots.png`):
 
