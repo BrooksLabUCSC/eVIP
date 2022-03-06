@@ -37,8 +37,8 @@ NUM_REPS = 3
 #LOG10_ZERO = 10.0
 LOG10_ZERO = 35.0
 
-DEF_IE_COL = "x_ie_a549"
-DEF_ALLELE_COL = "x_mutation_status"
+# DEF_IE_COL = "x_ie_a549"
+# DEF_ALLELE_COL = "x_mutation_status"
 
 #################
 # END CONSTANTS #
@@ -95,8 +95,8 @@ def main():
                           dest="allele_col",
                           type="string",
                           help="""Column name that indicates the allele names.
-                                  DEF=%s""" % DEF_ALLELE_COL,
-                          default=DEF_ALLELE_COL)
+                                  DEF= "allele" """ ,
+                          default="allele")
     opt_parser.add_option("-o",
                           dest="output_file_prefix",
                           type="string",
@@ -137,8 +137,7 @@ def main():
                           dest="ie_col",
                           type="string",
                           help="""Name of the column with infection efficiency
-                                  information. DEF=%s""" % DEF_IE_COL,
-                          default=DEF_IE_COL)
+                                  information.""" )
     opt_parser.add_option("--ie_filter",
                           dest="ie_filter",
                           type="float",
@@ -191,8 +190,10 @@ def run_main(sig_info=None, gctx = None, allele_col = None, o = None, r = None,
 
     #default values
     i = int(i) if i != None else int(1000)
-    ie_col = str(ie_col) if ie_col != None else str(x_ie_a549)
+    # ie_col = str(ie_col) if ie_col != None else str(x_ie_a549)
     ie_filter = float(ie_filter) if ie_filter != None else float(0.0)
+    if ie_filter == float(0.0):
+        ie_col = None
     num_reps = int(num_reps) if num_reps != None else int(3)
 
 
@@ -594,9 +595,10 @@ def parse_sig_info(sig_info_file, ref2test_allele, allele_col, ie_col,
             allele_idx = lineList.index(allele_col)
             cell_idx = lineList.index("cell_id")
 
-            ie_cols = ie_col.split(",")
-            for ie_col in ie_cols:
-                ie_col_idxs.append(lineList.index(ie_col))
+            if ie_filter:
+                ie_cols = ie_col.split(",")
+                for ie_col in ie_cols:
+                    ie_col_idxs.append(lineList.index(ie_col))
             continue
 
         if cell_id:
