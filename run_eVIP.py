@@ -61,9 +61,8 @@ def main(infile=None, zscore_gct = None, out_directory=None, sig_info =None,
                         infection efficiency information. DEF=x_ie_a549""")
     parser.add_argument("-i",
                         help = "Number of iterations to run. DEF=1000")
-    parser.add_argument("-allele_col",
-                        help = """Column name in sig_info file that indicates
-                        the allele names. DEF=x_mutation_status""")
+    parser.add_argument("-allele_col", default = "allele", help = """Column name
+                in sig_info file that indicates the allele names.DEF=allele""")
     parser.add_argument("-conn_null",
                         help = """Optional file containing connectivity null
                         values from a previous run. Should end in _conn_null.txt""")

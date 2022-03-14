@@ -52,6 +52,8 @@ def main(infile=None, zscore_gct = None, out_directory=None, sig_info =None,
     #from corr
     parser.add_argument("--infile", help="""Input txt file (filtered and
                 log transformed data).""")
+    parser.add_argument("--input_gene_tpm",
+                help="Gene tpm table input for eVIP overall prediction")
     parser.add_argument("-zscore_gct", help="""Zscore input gct file (use
                 instead of --infile)""")
     parser.add_argument("--out_directory",required=True, help="""Path to directory
@@ -169,8 +171,6 @@ def main(infile=None, zscore_gct = None, out_directory=None, sig_info =None,
     #run_eVIP2
     parser.add_argument("--input_dir",
                 help="Path to directory of kallisto outputs")
-    parser.add_argument("--input_gene_tpm",
-                help="Gene tpm table input for eVIP overall prediction")
     parser.add_argument("--gtf",
                 help="Gtf file used to convert transcript counts to gene counts")
     parser.add_argument("--control",
@@ -221,20 +221,28 @@ def main(infile=None, zscore_gct = None, out_directory=None, sig_info =None,
             #combining to gene level the original way
             transcript_to_gene_counts(combined_kallisto_transcript_df)
 
+        #filtering out low expressed genes and doing log2 transformation
+        print("Filtering out low expressed genes and doing log2 transformation...")
+        filterGeneExpressionTable.main(in_table=args.out_directory+"/kallisto_files/combined_kallisto_abundance_genes.tsv",
+                        out_table=args.out_directory+"/kallisto_files/combined_kallisto_abundance_genes_filtered_transformed.tsv",
+                        x = 1,l=True,reformat_gene = None,fpkms = None,
+                        min_val = args.min_tpm, min_fold_fpkm = None)
+
+        eVIP_infile_path = args.out_directory+"/kallisto_files/combined_kallisto_abundance_genes_filtered_transformed.tsv"
+
     #if input gene tpm
     if args.input_gene_tpm:
+        
         filterGeneExpressionTable.main(in_table=args.input_gene_tpm,
-                    out_table=args.out_directory+"/kallisto_files/combined_kallisto_abundance_genes_filtered_transformed.tsv",
+                    out_table=args.out_directory+"/combined_kallisto_abundance_genes_filtered_transformed.tsv",
                     x = 1,l=True,reformat_gene = None,fpkms = None,
                     min_val = args.min_tpm, min_fold_fpkm = None)
 
+        eVIP_infile_path = args.out_directory+"/combined_kallisto_abundance_genes_filtered_transformed.tsv"
 
-    #filtering out low expressed genes and doing log2 transformation
-    print("Filtering out low expressed genes and doing log2 transformation...")
-    filterGeneExpressionTable.main(in_table=args.out_directory+"/kallisto_files/combined_kallisto_abundance_genes.tsv",
-                    out_table=args.out_directory+"/kallisto_files/combined_kallisto_abundance_genes_filtered_transformed.tsv",
-                    x = 1,l=True,reformat_gene = None,fpkms = None,
-                    min_val = args.min_tpm, min_fold_fpkm = None)
+
+    if args.infile: 
+        eVIP_infile_path = args.infile
 
     #run eVIP overall
     overall_eVIP_dir = args.out_directory + "/eVIP_out"
@@ -244,7 +252,7 @@ def main(infile=None, zscore_gct = None, out_directory=None, sig_info =None,
 
 
     print("Running eVIP for overall function...")
-    run_eVIP(args.out_directory+"/kallisto_files/combined_kallisto_abundance_genes_filtered_transformed.tsv",
+    run_eVIP(eVIP_infile_path,
             None, overall_eVIP_dir, args.sig_info, args.c, args.r, args.num_reps,
             args.ie_filter, args.ie_col, None, args.allele_col, args.conn_null,
             args.conn_thresh,args.mut_wt_rep_rank_diff, args.use_c_pval,
@@ -281,7 +289,7 @@ def main(infile=None, zscore_gct = None, out_directory=None, sig_info =None,
             deseq_control = controls_list[0]
 
         if not deseq_control:
-            print("Error: Need deseq control. Set with -control ")
+            print("Error: Need deseq control. Set with --control ")
             sys.exit()
 
         comparisons_df = pd.read_csv(args.r, delim_whitespace=True)
