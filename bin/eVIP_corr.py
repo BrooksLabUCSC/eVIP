@@ -41,6 +41,7 @@ def run_main(input=None, zscore_gct=None, out_dir=None):
                 line = formatLine(line)
                 ncols = (str(len(line.split())))
                 if line.startswith("#"):
+                    #GCT file header formatting
                     header = line
                     header += "\n"
                     ncol_vals = int(ncols) - 1

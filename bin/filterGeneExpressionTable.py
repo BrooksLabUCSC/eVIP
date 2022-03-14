@@ -16,10 +16,10 @@ import math
 #############
 # CONSTANTS #
 #############
-# DEF_MIN_FOLD_FPKM = 0.0
-# DEF_MIN_FPKM = 1.0
+DEF_MIN_FOLD_FPKM = 0.0
+DEF_MIN_FPKM = 1.0
 #
-# START_VAL_IDX = 1
+START_VAL_IDX = 1
 INFINITY = 10
 #################
 # END CONSTANTS #
@@ -49,10 +49,9 @@ class OptionParser(optparse.OptionParser):
 # END CLASSES #
 ###############
 
-########
-# MAIN #
-########
-def main(in_table,out_table,x,l,reformat_gene,fpkms,min_fpkm,min_fold_fpkm):
+
+
+def main(in_table,out_table,x,l,reformat_gene,fpkms,min_val,min_fold_fpkm):
 
     in_table = open(in_table)
     out_table = open(out_table, "w")
@@ -60,6 +59,7 @@ def main(in_table,out_table,x,l,reformat_gene,fpkms,min_fpkm,min_fold_fpkm):
     log2_transform = l
     gene_col = reformat_gene
     fpkm_out = None
+    min_fpkm = min_val
 
     for line in in_table:
         if line.startswith("#"):
@@ -160,4 +160,83 @@ def transform(fpkm_list, log2transform):
 #################
 # END FUNCTIONS #
 #################
-if __name__ == "__main__": main()
+
+
+if __name__ == "__main__":
+    
+    
+    ########
+    # MAIN #
+    ########
+
+    opt_parser = OptionParser()
+
+    # Add Options. Required options should have default=None
+    opt_parser.add_option("--in_table",
+                        dest="in_table",
+                        type="string",
+                        help="Input table of gene expression values",
+                        default=None)
+    opt_parser.add_option("--out_table",
+                        dest="out_table",
+                        type="string",
+                        help="""Filtered output table. Filter is based on FPKM
+                                minimum threshold and minimum FPKM difference
+                                cutoffs""",
+                        default=None)
+    opt_parser.add_option("-i",
+                        dest="start_idx",
+                        type="int",
+                        help="0-based index of the start of the values. Def=%d" % START_VAL_IDX,
+                        default=START_VAL_IDX)
+    opt_parser.add_option("-l",
+                        dest="log2_transform",
+                        action="store_true",
+                        help="Will log2 transform the data.",
+                        default=None)
+    opt_parser.add_option("--reformat_gene",
+                        dest="gene_col",
+                        type="int",
+                        help="""Will reformat the gene name field if it is split
+                                by "|" characters. The gene is in the
+                                specified 0-based column""",
+                        default=None)
+    # opt_parser.add_option("--fpkms",
+    #                       dest="fpkms",
+    #                       type="string",
+    #                       help="""Optional: Output file listing all fpkms from the input
+    #                               table.""",
+                        # default=None)
+    opt_parser.add_option("--min_val",
+                        dest="min_val",
+                        type="float",
+                        help="""Minimum FPKM value for a given gene. If the
+                                gene is expressed below this level in all
+                                samples, the gene is filtered from the
+                                table. DEF=%.2f""" % DEF_MIN_FPKM,
+                        default=DEF_MIN_FPKM)
+    opt_parser.add_option("--min_fold_fpkm",
+                        dest="min_fold_fpkm",
+                        type="float",
+                        help="""If table will be used for differential
+                                expression analysis, then the minimum fold
+                                difference between the minimum fpkm and
+                                maximum fpkm can be used to remove genes.
+                                DEF=%.2f""" % DEF_MIN_FOLD_FPKM,
+                        default=DEF_MIN_FOLD_FPKM)
+
+    (options, args) = opt_parser.parse_args()
+
+    # validate the command line arguments
+    opt_parser.check_required("--in_table")
+    opt_parser.check_required("--out_table")
+
+
+    main(options.in_table,
+        options.out_table,
+        options.start_idx,
+        options.log2_transform,
+        None,
+        None,
+        options.min_val,
+        None)
