@@ -43,33 +43,50 @@ def main(infile=None, zscore_gct = None, out_directory=None, sig_info =None,
     parser = argparse.ArgumentParser()
 
     #from filter gene expression table
-    parser.add_argument("--min_tpm", help = """ When filtering the gene expression 
-                table, this value is the minimum TPM value for a given
-                gene. If the gene is expressed below this level in all samples,
+    parser.add_argument("--min_tpm", help = """When filtering the gene expression 
+                table given with --input_gene_tpm, this value is the minimum TPM 
+                value for each gene. If a gene is expressed below this level in all samples,
                 the gene is removed from the table. DEFAULT=1""",
                 default=1,type=float)
 
     #from corr
-    parser.add_argument("--infile", help="""Input txt file (filtered and
-                log transformed data).""")
+    parser.add_argument("--input_table", help="""Generic input table 
+                for eVIP overall prediction in .tsv format""")
     parser.add_argument("--input_gene_tpm",
-                help="Gene tpm table input for eVIP overall prediction")
-    parser.add_argument("-zscore_gct", help="""Zscore input gct file (use
-                instead of --infile)""")
-    parser.add_argument("--out_directory",required=True, help="""Path to directory
-                for eVIP output files""")
+                help="Gene expression TPM table input for eVIP overall prediction")
+    parser.add_argument("-zscore_gct", help="""Z-score input gct file (use
+                instead of --input_table or --input_gene_tpm)""")
+    parser.add_argument("--out_directory",required=True, help="""Path to put the
+                eVIP2 output directory""")
     #from compare
-    parser.add_argument("--sig_info",required=True, help = """sig info file with
-                gene information and distil information""")
+    parser.add_argument("--sig_info",required=True, help = """ A tsv file with
+                sample information for the following headers: distil_id, sig_id, 
+                pert_mfc_desc, cell_id, allele. Each row should list a different 
+                group of replicates.
+                
+                distil_id = replicate sample names	;
+                sig_id = the replicates conditiion ;
+                pert_mfc_desc  = the associated WT gene ;	
+                cell_id = name of the cell type used ;
+                allele = the version of the gene 
+                
+                For example:                				
+                distil_id = RNF43_R117fs_4|RNF43_R117fs_3|RNF43_R117fs_2|RNF43_R117fs_1	;
+                sig_id = RNF43_R117fs ;
+                pert_mfc_desc  = RNF43 ;	
+                cell_id = 293 ;
+                allele = RNF43_R117fs 
+                
+                """)
     parser.add_argument("-c",required=True, help = """.grp file containing
-                allele names of control perturbations. If this file is given,
-                a null will be calculated from these""")
+                the allele names of control perturbations. A null distribution
+                is calculated from these samples. The names listed in the file 
+                must match the "allele" column from the --sig_info file  """)
     parser.add_argument("-r", required=True, help = """File explicitly
                 indicating which comparisons to do. Assumes the file has a
                 header and it is ignored. The first column is the reference
-                allele and second column is test allele. If this file is not
-                given, then the reference alleles are assumed to be WT and
-                inferred from the allele names.""")
+                allele and second column is test allele. Alleles 
+                must match the "allele" column from the --sig_info file""")
     parser.add_argument("--num_reps",required=True, help = """Number of
                 replicates expected for each allele.""")
     parser.add_argument("--ie_filter", help = """Threshold for infection
@@ -155,7 +172,7 @@ def main(infile=None, zscore_gct = None, out_directory=None, sig_info =None,
     #eVIPP
     parser.add_argument("--eVIPP", action ="store_true",
                 help="""Use this option when doing pathway analysis, must also
-                have gmt or JSON file """)
+                have gmt file """)
     parser.add_argument("--JSON",
                 help= """JSON file created by create_pathway_JSON.py. Contains
                 dictionary of pathways and the associated ids""")
@@ -170,17 +187,17 @@ def main(infile=None, zscore_gct = None, out_directory=None, sig_info =None,
 
     #run_eVIP2
     parser.add_argument("--input_dir",
-                help="Path to directory of kallisto outputs")
+                help="Path to directory of Kallisto outputs")
     parser.add_argument("--gtf",
                 help="Gtf file used to convert transcript counts to gene counts")
     parser.add_argument("--control",
                 required=False,
-                help="""If multiple controls in the controls file, designate
-                which to use for deseq2""")
+                help="""If there are multiple controls in the controls file, designate
+                which to use for DEseq2""")
     parser.add_argument("--tx2gene",
                 action ="store_true",required=False,
                 help="""Use tximport for transcript to gene conversion when
-                using -input_dir""")
+                using --input_dir""")
 
     global args
     args = parser.parse_args()
@@ -192,7 +209,7 @@ def main(infile=None, zscore_gct = None, out_directory=None, sig_info =None,
         os.makedirs(out_dir)
 
     #must have atleast one kind of input
-    input_types =[args.input_dir , args.input_gene_tpm, args.infile, args.zscore_gct]
+    input_types =[args.input_dir , args.input_gene_tpm, args.input_table, args.zscore_gct]
     if all(v is None for v in input_types):
         print("Error:Input data is missing")
         sys.exit()
@@ -241,8 +258,8 @@ def main(infile=None, zscore_gct = None, out_directory=None, sig_info =None,
         eVIP_infile_path = args.out_directory+"/combined_kallisto_abundance_genes_filtered_transformed.tsv"
 
 
-    if args.infile: 
-        eVIP_infile_path = args.infile
+    if args.input_table: 
+        eVIP_infile_path = args.input_table
 
     #run eVIP overall
     overall_eVIP_dir = args.out_directory + "/eVIP_out"
