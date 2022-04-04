@@ -589,7 +589,7 @@ def parse_sig_info(sig_info_file, ref2test_allele, allele_col, ie_col,
         lineList = line.split("\t")
 
         if "distil_id" in line:
-            sig_id_idx = lineList.index("sig_id")
+            # sig_id_idx = lineList.index("sig_id")
             distil_idx = lineList.index("distil_id")
             gene_idx = lineList.index("pert_mfc_desc")
             allele_idx = lineList.index(allele_col)
@@ -605,9 +605,9 @@ def parse_sig_info(sig_info_file, ref2test_allele, allele_col, ie_col,
             if cell_id != lineList[cell_idx]:
                 continue
 
-        if plate_id:
-            if plate_id not in lineList[sig_id_idx]:
-                continue
+        # if plate_id:
+        #     if plate_id not in lineList[sig_id_idx]:
+        #         continue
 
         if ie_filter:
             for ie_idx in ie_col_idxs:
