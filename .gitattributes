@@ -1,0 +1,2 @@
+*.html -linguist-detectable
+/misc/*.html -linguist-detectable
