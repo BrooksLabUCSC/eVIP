@@ -506,7 +506,8 @@ def deseq2_wts(comparisons_dict,cond_to_rep_dict,deseq_control,wts):
 
         #run DESeq 2
         runDE.main(group1=deseq_control, group2=wt, outDir=comparison_dir,
-                    inDir=args.input_dir, formula=formula_file)
+                    inDir=args.input_dir, formula=formula_file, 
+                    tx2gene=args.out_directory+"/kallisto_files/transcripts_genes.tsv")
 
 def deseq2_muts(comparisons_dict,cond_to_rep_dict,deseq_control):
 
@@ -538,7 +539,8 @@ def deseq2_muts(comparisons_dict,cond_to_rep_dict,deseq_control):
 
         #run DESeq 2
         runDE.main(group1=deseq_control, group2=mut, outDir=comparison_dir,
-                    inDir=args.input_dir, formula=formula_file)
+                    inDir=args.input_dir, formula=formula_file,
+                    tx2gene=args.out_directory+"/kallisto_files/transcripts_genes.tsv")
 
 def condition_to_replicates(sig_info_file):
     cond_to_rep = {}

@@ -22,7 +22,7 @@ pandas2ri.activate()
 R = robjects.r
 
 # main
-def main(group1=None, group2=None, outDir=None, inDir=None, formula=None):
+def main(group1=None, group2=None, outDir=None, inDir=None, formula=None, tx2gene=None):
 
     '''
     main
@@ -43,14 +43,20 @@ def main(group1=None, group2=None, outDir=None, inDir=None, formula=None):
     tximportData   = importr('tximportData')
     tximport   = importr('tximport')
     ensembldb   = importr('ensembldb')
-    EnsDb_Hsapiens_v86   = importr('EnsDb.Hsapiens.v86')
+    # EnsDb_Hsapiens_v86   = importr('EnsDb.Hsapiens.v86')
     #deseq
     methods   = importr('methods')
     deseq     = importr('DESeq2')
 
     #transcripts to gene, used in tximport
-    R('edb <- EnsDb.Hsapiens.v86')
-    R('tx2gene = transcripts(edb , columns=c("tx_id", "gene_name"),return.type="DataFrame")')
+    # R('edb <- EnsDb.Hsapiens.v86')
+    # R('tx2gene = transcripts(edb , columns=c("tx_id", "gene_name"),return.type="DataFrame")')
+
+    #Read in tx2gene file 
+    df_tx2gene = pd.read_csv(tx2gene, sep='\t', header=None, names=["TXNAME","GENEID"])
+    df_tx2gene = df_tx2gene.drop_duplicates()
+
+    R.assign('df_tx2gene',df_tx2gene)
 
     # import formula
     formulaDF     = pd.read_csv(formula,header=0, sep="\t")
@@ -67,7 +73,7 @@ def main(group1=None, group2=None, outDir=None, inDir=None, formula=None):
     R('all(file.exists(files))')
 
     #tximport conversion to gene
-    R('txi.kallisto <- tximport(files, type = "kallisto",tx2gene = tx2gene, txOut = FALSE,ignoreTxVersion=TRUE)')
+    R('txi.kallisto <- tximport(files, type = "kallisto",tx2gene = df_tx2gene, txOut = FALSE,ignoreTxVersion=TRUE)')
     R('rownames(sampleTable) <- samples')
 
     #DESeq
